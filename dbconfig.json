@@ -1,0 +1,14 @@
+{
+  "client": "postgresql",
+  "connection": {
+    "host": "localhost",
+    "user": "sopt",
+    "port": "5432",
+    "password": "sopt",
+    "database": "sopt-auth"
+  },
+  "interfaceNameFormat": "${table}",
+  "tableNameCasing": "pascal",
+  "folder": "src/__generated__",
+  "filename": "psql"
+}
