@@ -8,3 +8,9 @@ export interface Users {
   is_sopt_member?: boolean | null;
   name: string;
 }
+export interface UsersFacebookAuth {
+  facebook_access_token?: string | null;
+  facebook_auth_id?: string | null;
+  id?: number;
+  user_id?: number | null;
+}

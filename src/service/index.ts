@@ -1,19 +1,23 @@
 import { Repository } from "../repository";
+import { createTokenService, TokenService } from "./tokenService";
 
 export interface Services {
-  hello(): string;
+  tokenService: TokenService;
 }
 
 interface CreateServicesDeps {
   repository: Repository;
+  JWT_SECRET: string;
+  ORIGIN: string;
 }
 
-export function createServices({ repository }: CreateServicesDeps): Services {
+export function createServices({ repository, JWT_SECRET, ORIGIN }: CreateServicesDeps): Services {
   repository;
 
   return {
-    hello() {
-      return "world";
-    },
+    tokenService: createTokenService({
+      jwtSecret: JWT_SECRET,
+      origin: ORIGIN,
+    }),
   };
 }

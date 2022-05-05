@@ -13,9 +13,10 @@ CREATE TABLE users (
 
 
 CREATE TABLE users_facebook_auth (
-  id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  id SERIAL PRIMARY KEY,
 	facebook_access_token text,
 	facebook_auth_id text,
+  user_id INT,
 
-  foreign key(user_id) references(users.id)
+  FOREIGN KEY (user_id) REFERENCES users(id)
 )
