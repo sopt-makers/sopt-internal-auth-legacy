@@ -10,7 +10,7 @@ export interface Users {
 }
 export interface UsersFacebookAuth {
   facebook_access_token?: string | null;
-  facebook_auth_id?: string | null;
+  facebook_auth_id: string;
   id?: number;
-  user_id?: number | null;
+  user_id: number;
 }

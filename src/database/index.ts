@@ -1,9 +1,10 @@
 import { Kysely, PostgresDialect } from "kysely";
 
-import { Users } from "../__generated__/psql";
+import { Users, UsersFacebookAuth } from "../__generated__/psql";
 
 export interface DatabaseSchema {
   users: Users;
+  users_facebook_auth: UsersFacebookAuth;
 }
 
 export type Database = Kysely<DatabaseSchema>;
