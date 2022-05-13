@@ -73,7 +73,8 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
         .set({
           facebook_access_token: accessToken,
         })
-        .where("facebook_auth_id", "=", authId);
+        .where("facebook_auth_id", "=", authId)
+        .execute();
     },
   };
 }

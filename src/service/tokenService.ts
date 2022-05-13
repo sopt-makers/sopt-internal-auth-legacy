@@ -1,7 +1,7 @@
 import { sign } from "jsonwebtoken";
 
 export interface TokenService {
-  createAuthToken(data: { userId: string }): Promise<string>;
+  createAuthToken(data: { userId: number }): Promise<string>;
 }
 
 interface TokenServiceDeps {
@@ -15,7 +15,7 @@ export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): Tok
       const token = sign(
         {
           iss: origin,
-          sub: data.userId,
+          sub: `user|${data.userId}`,
         },
         jwtSecret,
         {

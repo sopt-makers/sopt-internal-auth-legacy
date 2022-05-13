@@ -1,8 +1,7 @@
 import { Router } from "express";
 
 import { Services } from "../service";
-import { asyncRoute } from "../util/route";
-
+import { createFacebookRoute } from "./facebook";
 interface CreateRoutesDeps {
   services: Services;
 }
@@ -10,16 +9,7 @@ interface CreateRoutesDeps {
 export function createRoutes({ services }: CreateRoutesDeps) {
   const router = Router();
 
-  router.get(
-    "/",
-    asyncRoute(async (_req, res) => {
-      const ret = services.hello();
-
-      res.json({
-        message: ret,
-      });
-    }),
-  );
+  router.use("/auth/facebook", createFacebookRoute({ services }));
 
   return router;
 }
