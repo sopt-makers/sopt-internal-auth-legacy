@@ -11,14 +11,22 @@ export interface Repository {
 
 interface RepositoryDeps {
   db: Database;
+  facebookAppId: string;
+  facebookAppSecret: string;
+  facebookAppRedirectUri: string;
 }
 
-export function createRepository({ db }: RepositoryDeps): Repository {
+export function createRepository({
+  db,
+  facebookAppId,
+  facebookAppSecret,
+  facebookAppRedirectUri,
+}: RepositoryDeps): Repository {
   return {
     facebookAPI: createFacebookAPIRepository({
-      clientAppId: "",
-      clientSecret: "",
-      redirectUri: "",
+      clientAppId: facebookAppId,
+      clientSecret: facebookAppSecret,
+      redirectUri: facebookAppRedirectUri,
       adminToken: "",
     }),
     user: createUserRepository(db),

@@ -13,17 +13,18 @@ export function createUserRepository(db: Database): UserRepository {
       return ret ?? null;
     },
     async createUser() {
-      const ret = await db
+      const { id } = await db
         .insertInto("users")
         .values({
           bio: "",
           name: "",
           is_sopt_member: false,
         })
-        .executeTakeFirst();
+        .returning("id")
+        .executeTakeFirstOrThrow();
 
       return {
-        userId: Number(ret.insertId),
+        userId: Number(id),
       };
     },
   };

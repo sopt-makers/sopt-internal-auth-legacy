@@ -23,6 +23,13 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
 
       const ret = await services.authService.authByFacebook(code);
 
+      if (!ret) {
+        res.status(400).json({
+          message: "인증에 실패했습니다.",
+        });
+        return;
+      }
+
       const token = await services.tokenService.createAuthToken({ userId: ret.userId });
 
       res.json({

@@ -6,7 +6,7 @@ export interface AuthService {
   authByFacebook(code: string): Promise<{
     authId: string;
     userId: number;
-  }>;
+  } | null>;
 }
 
 interface AuthServiceDeps {
@@ -22,10 +22,16 @@ export function createAuthService({
 }: AuthServiceDeps): AuthService {
   return {
     async authByFacebook(code) {
-      const { accessToken } = await facebookAPIRepository.getAccessTokenByCode(code);
+      const accessToken = await facebookAPIRepository.getAccessTokenByCode(code);
+
+      if (!accessToken) {
+        return null;
+      }
+
       const fbUserInfo = await facebookAPIRepository.getAccessTokenInfo(accessToken);
 
       let userInfo = await facebookAuthRepository.findByAuthId(fbUserInfo.userId);
+
       if (!userInfo) {
         const createdUser = await userRepository.createUser();
         userInfo = await facebookAuthRepository.create({
