@@ -33,7 +33,7 @@ export function createAuthService({
       let userInfo = await facebookAuthRepository.findByAuthId(fbUserInfo.userId);
 
       if (!userInfo) {
-        const createdUser = await userRepository.createUser();
+        const createdUser = await userRepository.createUser({ name: fbUserInfo.userName });
         userInfo = await facebookAuthRepository.create({
           authId: fbUserInfo.userId,
           userId: createdUser.userId,

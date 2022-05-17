@@ -3,7 +3,7 @@ import { Database } from "../database";
 
 export interface UserRepository {
   getUserByUserId(userId: string): Promise<Users | null>;
-  createUser(): Promise<{ userId: number }>;
+  createUser(init: { name?: string }): Promise<{ userId: number }>;
 }
 
 export function createUserRepository(db: Database): UserRepository {
@@ -12,12 +12,12 @@ export function createUserRepository(db: Database): UserRepository {
       const ret = await db.selectFrom("users").where("id", "=", parseInt(userId)).selectAll().executeTakeFirst();
       return ret ?? null;
     },
-    async createUser() {
+    async createUser(init) {
       const { id } = await db
         .insertInto("users")
         .values({
           bio: "",
-          name: "",
+          name: init.name ?? "",
           is_sopt_member: false,
         })
         .returning("id")

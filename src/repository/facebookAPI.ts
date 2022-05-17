@@ -5,7 +5,7 @@ export interface FacebookAPIRepository {
   getAccessTokenByCode(code: string): Promise<string | null>;
   getAccessTokenInfo(accessToken: string): Promise<{
     userId: string;
-    scopes: string[];
+    userName: string;
   }>;
 }
 
@@ -21,20 +21,6 @@ export function createFacebookAPIRepository({
   clientSecret,
   redirectUri,
 }: FacebokAPIRepositoryDeps): FacebookAPIRepository {
-  async function getAppAccessToken(): Promise<string> {
-    const res = await axios.get("https://graph.facebook.com/oauth/access_token", {
-      params: {
-        client_id: clientAppId,
-        client_secret: clientSecret,
-        grant_type: "client_credentials",
-      },
-    });
-
-    const accessToken = res.data.access_token;
-
-    return accessToken;
-  }
-
   return {
     async getAccessTokenByCode(code) {
       const [err, ret] = await to(
@@ -58,13 +44,10 @@ export function createFacebookAPIRepository({
       return ret.data.access_token;
     },
     async getAccessTokenInfo(accessToken) {
-      const adminToken = await getAppAccessToken();
-
       const [err, res] = await to(
-        axios.get("https://graph.facebook.com/debug_token", {
+        axios.get("https://graph.facebook.com/me", {
           params: {
-            input_token: accessToken,
-            access_token: adminToken,
+            access_token: accessToken,
           },
         }),
       );
@@ -77,11 +60,11 @@ export function createFacebookAPIRepository({
         throw err;
       }
 
-      const { data } = res.data;
+      const data = res.data;
 
       return {
-        userId: data.user_id,
-        scopes: data.scopes,
+        userId: data.id,
+        userName: data.name,
       };
     },
   };
