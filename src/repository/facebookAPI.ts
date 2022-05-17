@@ -7,6 +7,15 @@ export interface FacebookAPIRepository {
     userId: string;
     userName: string;
   }>;
+  getGroupInfo(
+    userId: string,
+    accessToken: string,
+  ): Promise<
+    Array<{
+      groupId: string;
+      groupName: string;
+    }>
+  >;
 }
 
 interface FacebokAPIRepositoryDeps {
@@ -30,6 +39,7 @@ export function createFacebookAPIRepository({
             redirect_uri: redirectUri,
             client_secret: clientSecret,
             code: code,
+            scope: "public_profile,email,groups_access_member_info",
           },
         }),
       );
@@ -66,6 +76,34 @@ export function createFacebookAPIRepository({
         userId: data.id,
         userName: data.name,
       };
+    },
+    async getGroupInfo(facebookuUerId: string, accessToken: string) {
+      interface Group {
+        name: string;
+        id: string;
+      }
+
+      const [err, res] = await to(
+        axios.get(`https://graph.facebook.com/v13.0/${facebookuUerId}/groups`, {
+          params: {
+            access_token: accessToken,
+          },
+        }),
+      );
+
+      if (err) {
+        if (axios.isAxiosError(err)) {
+          console.log(err.response?.data);
+        }
+        throw err;
+      }
+
+      const groups: Group[] = res.data.data;
+
+      return groups.map((group) => ({
+        groupId: group.id,
+        groupName: group.name,
+      }));
     },
   };
 }

@@ -2,14 +2,15 @@ import { Users } from "../__generated__/psql";
 import { Database } from "../database";
 
 export interface UserRepository {
-  getUserByUserId(userId: string): Promise<Users | null>;
+  getUserByUserId(userId: number): Promise<Users | null>;
   createUser(init: { name?: string }): Promise<{ userId: number }>;
+  setUserVerified(userId: number): Promise<void>;
 }
 
 export function createUserRepository(db: Database): UserRepository {
   return {
-    async getUserByUserId(userId: string) {
-      const ret = await db.selectFrom("users").where("id", "=", parseInt(userId)).selectAll().executeTakeFirst();
+    async getUserByUserId(userId) {
+      const ret = await db.selectFrom("users").where("id", "=", userId).selectAll().executeTakeFirst();
       return ret ?? null;
     },
     async createUser(init) {
@@ -26,6 +27,15 @@ export function createUserRepository(db: Database): UserRepository {
       return {
         userId: Number(id),
       };
+    },
+    async setUserVerified(userId) {
+      await db
+        .updateTable("users")
+        .where("id", "=", userId)
+        .set({
+          is_sopt_member: true,
+        })
+        .executeTakeFirstOrThrow();
     },
   };
 }
