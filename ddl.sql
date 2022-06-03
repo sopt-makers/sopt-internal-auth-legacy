@@ -20,3 +20,10 @@ CREATE TABLE users_facebook_auth (
 
   FOREIGN KEY (user_id) REFERENCES users(id)
 )
+
+CREATE TABLE sopt_member (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20),
+  email text NOT NULL,
+  user_id INT
+)

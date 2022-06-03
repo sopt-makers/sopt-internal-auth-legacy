@@ -4,6 +4,8 @@ import { z } from "zod";
 export interface TokenService {
   createAuthToken(data: { userId: number }): Promise<string>;
   verifyAuthToken(accessToken: string): Promise<{ userId: number }>;
+  createRegisterToken(soptMemberId: number): Promise<string>;
+  verifyRegisterToken(token: string): Promise<{ userId: number }>;
 }
 
 interface TokenServiceDeps {
@@ -42,6 +44,24 @@ export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): Tok
       if (isNaN(userId)) {
         throw new Error(`Not a valid user ID (${userId})`);
       }
+
+      return {
+        userId,
+      };
+    },
+    async createRegisterToken(soptMemberId) {
+      const token = sign({ register: soptMemberId }, jwtSecret, { algorithm: "HS256", expiresIn: "12h" });
+      return token;
+    },
+    async verifyRegisterToken(token) {
+      const extracted = verify(token, jwtSecret);
+
+      const validator = z.object({
+        register: z.number(),
+      });
+
+      const tokenInfo = validator.parse(extracted);
+      const userId = tokenInfo.register;
 
       return {
         userId,

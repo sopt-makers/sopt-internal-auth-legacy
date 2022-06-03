@@ -39,7 +39,6 @@ export function createFacebookAPIRepository({
             redirect_uri: redirectUri,
             client_secret: clientSecret,
             code: code,
-            scope: "public_profile,email,groups_access_member_info",
           },
         }),
       );

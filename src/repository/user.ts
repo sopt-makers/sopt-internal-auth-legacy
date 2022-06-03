@@ -3,6 +3,7 @@ import { Database } from "../database";
 
 export interface UserRepository {
   getUserByUserId(userId: number): Promise<Users | null>;
+
   createUser(init: { name?: string }): Promise<{ userId: number }>;
   setUserVerified(userId: number): Promise<void>;
 }
