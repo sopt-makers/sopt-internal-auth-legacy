@@ -1,7 +1,7 @@
 import to from "await-to-js";
 
 import { EmailRepository } from "../repository/email";
-import { SoptPersonRepsitory } from "../repository/soptPerson";
+import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
 import { TokenService } from "./tokenService";
 
@@ -15,40 +15,40 @@ export interface RegisterService {
 
 interface RegisterServiceDeps {
   emailRepository: EmailRepository;
-  soptPersonRepository: SoptPersonRepsitory;
+  soptMemberRepository: SoptMemberRepsitory;
   userRepository: UserRepository;
   tokenService: TokenService;
 }
 
 export function createRegisterService({
   emailRepository,
-  soptPersonRepository,
+  soptMemberRepository: soptMemberRepository,
   userRepository,
   tokenService,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
-      const soptPerson = await soptPersonRepository.findByEmail(email);
+      const soptMember = await soptMemberRepository.findByEmail(email);
 
-      if (!soptPerson) {
+      if (!soptMember) {
         return;
       }
 
-      if (soptPerson.userId !== null) {
+      if (soptMember.userId !== null) {
         return;
       }
 
-      const code = await tokenService.createRegisterToken(soptPerson.id);
+      const code = await tokenService.createRegisterToken(soptMember.id);
 
       await emailRepository.sendEmail(email, "SOPT 회원 인증", `code: ${code}`);
     },
     async getRegisterInfo(token) {
-      const [err, ret] = await to(tokenService.verifyRegisterToken(token));
-      if (err) {
+      const registerTokenInfo = await tokenService.verifyRegisterToken(token);
+      if (!registerTokenInfo) {
         return null;
       }
 
-      const member = await soptPersonRepository.findById(ret.userId);
+      const member = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
 
       return {
         name: member?.name ?? "",
@@ -60,7 +60,7 @@ export function createRegisterService({
         return { success: false };
       }
 
-      const member = await soptPersonRepository.findById(ret.userId);
+      const member = await soptMemberRepository.findById(ret.soptMemberId);
 
       await userRepository.createUser({
         name: member?.name ?? data.name,

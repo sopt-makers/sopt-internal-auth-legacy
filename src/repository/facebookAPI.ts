@@ -22,7 +22,6 @@ interface FacebokAPIRepositoryDeps {
   clientAppId: string;
   redirectUri: string;
   clientSecret: string;
-  adminToken: string;
 }
 
 export function createFacebookAPIRepository({

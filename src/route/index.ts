@@ -13,7 +13,7 @@ export function createRoutes({ services }: CreateRoutesDeps) {
 
   const authUtil = createAuthUtil({ tokenService: services.tokenService });
 
-  router.use("/auth/facebook", createFacebookRoute({ services }));
+  router.use("/idp/facebook", createFacebookRoute({ services }));
   router.use("/verify", createVerifyRoute({ services, authUtil }));
 
   return router;

@@ -1,12 +1,16 @@
 import { Database } from "../database";
+import { createEmailRepository, EmailRepository } from "./email";
 import { createFacebookAPIRepository, FacebookAPIRepository } from "./facebookAPI";
 import { createFacebookAuthRepository, FacebookAuthRepository } from "./facebookAuth";
+import { createSoptMemberRepsitory, SoptMemberRepsitory } from "./soptPerson";
 import { createUserRepository, UserRepository } from "./user";
 
 export interface Repository {
   user: UserRepository;
   facebookAPI: FacebookAPIRepository;
   facebookAuth: FacebookAuthRepository;
+  soptMember: SoptMemberRepsitory;
+  email: EmailRepository;
 }
 
 interface RepositoryDeps {
@@ -27,9 +31,10 @@ export function createRepository({
       clientAppId: facebookAppId,
       clientSecret: facebookAppSecret,
       redirectUri: facebookAppRedirectUri,
-      adminToken: "",
     }),
     user: createUserRepository(db),
     facebookAuth: createFacebookAuthRepository({ db }),
+    soptMember: createSoptMemberRepsitory({ db }),
+    email: createEmailRepository({ senderAddress: "asdf" }),
   };
 }

@@ -1,22 +1,23 @@
 import { Database } from "../database";
 
-export interface SoptPersonRepsitory {
-  findByEmail(email: string): Promise<SoptPerson | null>;
-  findById(id: number): Promise<SoptPerson | null>;
+export interface SoptMemberRepsitory {
+  findByEmail(email: string): Promise<SoptMember | null>;
+  findById(id: number): Promise<SoptMember | null>;
+  setUserId(memberId: number, userId: number): Promise<void>;
 }
 
-interface SoptPerson {
+interface SoptMember {
   id: number;
   name: string | null;
   email: string;
   userId: number | null;
 }
 
-interface SoptPersonRepositoryDeps {
+interface SoptMemberRepositoryDeps {
   db: Database;
 }
 
-export function createSoptPersonRepsitory({ db }: SoptPersonRepositoryDeps): SoptPersonRepsitory {
+export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): SoptMemberRepsitory {
   return {
     async findByEmail(email) {
       const ret = await db
@@ -52,6 +53,15 @@ export function createSoptPersonRepsitory({ db }: SoptPersonRepositoryDeps): Sop
         email: ret.email,
         userId: ret.user_id ?? null,
       };
+    },
+    async setUserId(memberId, userId) {
+      await db
+        .updateTable("sopt_member")
+        .where("id", "=", memberId)
+        .set({
+          user_id: userId,
+        })
+        .executeTakeFirstOrThrow();
     },
   };
 }

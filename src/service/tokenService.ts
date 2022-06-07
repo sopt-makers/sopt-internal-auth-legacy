@@ -5,7 +5,7 @@ export interface TokenService {
   createAuthToken(data: { userId: number }): Promise<string>;
   verifyAuthToken(accessToken: string): Promise<{ userId: number }>;
   createRegisterToken(soptMemberId: number): Promise<string>;
-  verifyRegisterToken(token: string): Promise<{ userId: number }>;
+  verifyRegisterToken(token: string): Promise<{ soptMemberId: number } | null>;
 }
 
 interface TokenServiceDeps {
@@ -50,21 +50,33 @@ export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): Tok
       };
     },
     async createRegisterToken(soptMemberId) {
-      const token = sign({ register: soptMemberId }, jwtSecret, { algorithm: "HS256", expiresIn: "12h" });
+      const token = sign({ register: soptMemberId }, jwtSecret, { algorithm: "HS256", expiresIn: "6h" });
       return token;
     },
     async verifyRegisterToken(token) {
-      const extracted = verify(token, jwtSecret);
+      const extracted = () => {
+        try {
+          return verify(token, jwtSecret);
+        } catch {
+          return null;
+        }
+      };
+      if (!extracted) {
+        return null;
+      }
 
       const validator = z.object({
         register: z.number(),
       });
 
-      const tokenInfo = validator.parse(extracted);
-      const userId = tokenInfo.register;
+      const tokenInfo = validator.safeParse(extracted);
+      if (!tokenInfo.success) {
+        return null;
+      }
+      const soptMemberId = tokenInfo.data.register;
 
       return {
-        userId,
+        soptMemberId,
       };
     },
   };
