@@ -1,4 +1,4 @@
-import { FacebookAPIRepository } from "../repository/facebookAPI";
+import { FacebookAPIExternal } from "../external/facebookAPI";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
 import { UserRepository } from "../repository/user";
 
@@ -9,13 +9,13 @@ export interface UserService {
 }
 
 interface UserServiceDeps {
-  facebookAPIRepository: FacebookAPIRepository;
+  facebookAPIExternal: FacebookAPIExternal;
   facebookAuthRepository: FacebookAuthRepository;
   userRepository: UserRepository;
 }
 
 export function createUserService({
-  facebookAPIRepository,
+  facebookAPIExternal,
   facebookAuthRepository,
   userRepository,
 }: UserServiceDeps): UserService {
@@ -31,7 +31,7 @@ export function createUserService({
         return false;
       }
 
-      const groupInfo = await facebookAPIRepository.getGroupInfo(fbInfo.authId, fbInfo.accessToken);
+      const groupInfo = await facebookAPIExternal.getGroupInfo(fbInfo.authId, fbInfo.accessToken);
 
       const soptNotice = groupInfo.find((group) => group.groupId === SOPT_NOTICE_GROUP_ID);
       if (!soptNotice) {

@@ -1,6 +1,4 @@
-import to from "await-to-js";
-
-import { EmailRepository } from "../repository/email";
+import { EmailExternal } from "../external/email";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
 import { TokenService } from "./tokenService";
@@ -14,14 +12,14 @@ export interface RegisterService {
 }
 
 interface RegisterServiceDeps {
-  emailRepository: EmailRepository;
+  emailExternal: EmailExternal;
   soptMemberRepository: SoptMemberRepsitory;
   userRepository: UserRepository;
   tokenService: TokenService;
 }
 
 export function createRegisterService({
-  emailRepository,
+  emailExternal: emailRepository,
   soptMemberRepository: soptMemberRepository,
   userRepository,
   tokenService,
@@ -55,8 +53,8 @@ export function createRegisterService({
       };
     },
     async processRegister(token, data) {
-      const [err, ret] = await to(tokenService.verifyRegisterToken(token));
-      if (err) {
+      const ret = await tokenService.verifyRegisterToken(token);
+      if (!ret) {
         return { success: false };
       }
 

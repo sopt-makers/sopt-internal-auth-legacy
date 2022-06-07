@@ -1,4 +1,4 @@
-import { FacebookAPIRepository } from "../repository/facebookAPI";
+import { FacebookAPIExternal } from "../external/facebookAPI";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
@@ -10,7 +10,7 @@ export interface AuthService {
 }
 
 interface AuthServiceDeps {
-  facebookAPIRepository: FacebookAPIRepository;
+  facebookAPIExternal: FacebookAPIExternal;
   facebookAuthRepository: FacebookAuthRepository;
   userRepository: UserRepository;
   soptMemberRepository: SoptMemberRepsitory;
@@ -18,7 +18,7 @@ interface AuthServiceDeps {
 }
 
 export function createAuthService({
-  facebookAPIRepository,
+  facebookAPIExternal,
   facebookAuthRepository,
   userRepository,
   soptMemberRepository,
@@ -26,12 +26,12 @@ export function createAuthService({
 }: AuthServiceDeps): AuthService {
   return {
     async authByFacebook(code) {
-      const fbAccessToken = await facebookAPIRepository.getAccessTokenByCode(code);
+      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
       if (!fbAccessToken) {
         return null;
       }
 
-      const fbUserInfo = await facebookAPIRepository.getAccessTokenInfo(fbAccessToken);
+      const fbUserInfo = await facebookAPIExternal.getAccessTokenInfo(fbAccessToken);
 
       const userInfo = await facebookAuthRepository.findByAuthId(fbUserInfo.userId);
       if (!userInfo) {
@@ -46,16 +46,13 @@ export function createAuthService({
     },
     async registerByFacebook(registerToken, code) {
       const registerTokenInfo = await tokenService.verifyRegisterToken(registerToken);
-      if (!registerTokenInfo) {
+      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
+
+      if (!registerTokenInfo || !fbAccessToken) {
         return null;
       }
 
-      const fbAccessToken = await facebookAPIRepository.getAccessTokenByCode(code);
-      if (!fbAccessToken) {
-        return null;
-      }
-
-      const fbUserInfo = await facebookAPIRepository.getAccessTokenInfo(fbAccessToken);
+      const fbUserInfo = await facebookAPIExternal.getAccessTokenInfo(fbAccessToken);
 
       const soptMemberInfo = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
       if (!soptMemberInfo) {

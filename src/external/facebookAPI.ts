@@ -1,7 +1,7 @@
 import to from "await-to-js";
 import axios from "axios";
 
-export interface FacebookAPIRepository {
+export interface FacebookAPIExternal {
   getAccessTokenByCode(code: string): Promise<string | null>;
   getAccessTokenInfo(accessToken: string): Promise<{
     userId: string;
@@ -18,17 +18,17 @@ export interface FacebookAPIRepository {
   >;
 }
 
-interface FacebokAPIRepositoryDeps {
+interface FacebokAPIExternalDeps {
   clientAppId: string;
   redirectUri: string;
   clientSecret: string;
 }
 
-export function createFacebookAPIRepository({
+export function createFacebookAPIExternal({
   clientAppId,
   clientSecret,
   redirectUri,
-}: FacebokAPIRepositoryDeps): FacebookAPIRepository {
+}: FacebokAPIExternalDeps): FacebookAPIExternal {
   return {
     async getAccessTokenByCode(code) {
       const [err, ret] = await to(

@@ -1,14 +1,14 @@
 import nodemailer from "nodemailer";
 
-export interface EmailRepository {
+export interface EmailExternal {
   sendEmail(to: string, subject: string, html: string): Promise<{ accepted: unknown[] }>;
 }
 
-interface EmailRepositoryDeps {
+interface EmailExternalDeps {
   senderAddress: string;
 }
 
-export function createEmailRepository({ senderAddress }: EmailRepositoryDeps): EmailRepository {
+export function createEmailExternal({ senderAddress }: EmailExternalDeps): EmailExternal {
   const transporter = nodemailer.createTransport({
     host: "smtp.ethereal.email",
     port: 587,

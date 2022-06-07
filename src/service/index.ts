@@ -1,3 +1,4 @@
+import { Externals } from "../external";
 import { Repository } from "../repository";
 import { AuthService, createAuthService } from "./authService";
 import { createRegisterService, RegisterService } from "./registerService";
@@ -13,11 +14,12 @@ export interface Services {
 
 interface CreateServicesDeps {
   repository: Repository;
+  externals: Externals;
   JWT_SECRET: string;
   ORIGIN: string;
 }
 
-export function createServices({ repository, JWT_SECRET, ORIGIN }: CreateServicesDeps): Services {
+export function createServices({ repository, externals, JWT_SECRET, ORIGIN }: CreateServicesDeps): Services {
   const tokenService = createTokenService({
     jwtSecret: JWT_SECRET,
     origin: ORIGIN,
@@ -25,19 +27,19 @@ export function createServices({ repository, JWT_SECRET, ORIGIN }: CreateService
   return {
     tokenService,
     authService: createAuthService({
-      facebookAPIRepository: repository.facebookAPI,
+      facebookAPIExternal: externals.facebookAPI,
       facebookAuthRepository: repository.facebookAuth,
       userRepository: repository.user,
       soptMemberRepository: repository.soptMember,
       tokenService,
     }),
     userService: createUserService({
-      facebookAPIRepository: repository.facebookAPI,
+      facebookAPIExternal: externals.facebookAPI,
       facebookAuthRepository: repository.facebookAuth,
       userRepository: repository.user,
     }),
     registerService: createRegisterService({
-      emailRepository: repository.email,
+      emailExternal: externals.email,
       soptMemberRepository: repository.soptMember,
       userRepository: repository.user,
       tokenService: tokenService,
