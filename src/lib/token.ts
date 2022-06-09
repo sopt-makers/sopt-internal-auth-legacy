@@ -1,19 +1,19 @@
 import { sign, verify } from "jsonwebtoken";
 import { z } from "zod";
 
-export interface TokenService {
+export interface TokenClient {
   createAuthToken(data: { userId: number }): Promise<string>;
   verifyAuthToken(accessToken: string): Promise<{ userId: number }>;
   createRegisterToken(soptMemberId: number): Promise<string>;
   verifyRegisterToken(token: string): Promise<{ soptMemberId: number } | null>;
 }
 
-interface TokenServiceDeps {
+interface TokenClientDeps {
   jwtSecret: string;
   origin: string;
 }
 
-export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): TokenService {
+export function createTokenClient({ jwtSecret, origin }: TokenClientDeps): TokenClient {
   return {
     async createAuthToken(data) {
       const token = sign(
@@ -54,13 +54,7 @@ export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): Tok
       return token;
     },
     async verifyRegisterToken(token) {
-      const extracted = () => {
-        try {
-          return verify(token, jwtSecret);
-        } catch {
-          return null;
-        }
-      };
+      const extracted = safeVerify(token, jwtSecret);
       if (!extracted) {
         return null;
       }
@@ -80,4 +74,12 @@ export function createTokenService({ jwtSecret, origin }: TokenServiceDeps): Tok
       };
     },
   };
+}
+
+function safeVerify(token: string, jwtSecret: string) {
+  try {
+    return verify(token, jwtSecret);
+  } catch {
+    return null;
+  }
 }

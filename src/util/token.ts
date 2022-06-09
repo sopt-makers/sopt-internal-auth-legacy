@@ -1,7 +1,7 @@
 import to from "await-to-js";
 import { NextFunction, Request, Response } from "express";
 
-import { TokenService } from "../service/tokenService";
+import { TokenClient } from "../lib/token";
 
 export interface AuthUtil {
   authRequired(): Middleware;
@@ -11,10 +11,10 @@ export interface AuthUtil {
 type Middleware = (req: Request, res: Response, next: NextFunction) => void | Promise<void>;
 
 interface AuthUtilDeps {
-  tokenService: TokenService;
+  tokenClient: TokenClient;
 }
 
-export function createAuthUtil({ tokenService }: AuthUtilDeps): AuthUtil {
+export function createAuthUtil({ tokenClient }: AuthUtilDeps): AuthUtil {
   interface AuthInfo {
     userId: number;
   }
@@ -41,7 +41,7 @@ export function createAuthUtil({ tokenService }: AuthUtilDeps): AuthUtil {
 
         const accessToken = authHeader.split("Bearer ")[1];
 
-        const [err, user] = await to(tokenService.verifyAuthToken(accessToken));
+        const [err, user] = await to(tokenClient.verifyAuthToken(accessToken));
 
         if (err) {
           unauthorized(res);

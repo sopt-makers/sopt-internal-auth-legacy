@@ -1,7 +1,7 @@
 import { EmailExternal } from "../external/email";
+import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
-import { TokenService } from "./tokenService";
 
 export interface RegisterService {
   sendRegisterLinkByEmail(email: string): Promise<void>;
@@ -15,14 +15,14 @@ interface RegisterServiceDeps {
   emailExternal: EmailExternal;
   soptMemberRepository: SoptMemberRepsitory;
   userRepository: UserRepository;
-  tokenService: TokenService;
+  tokenClient: TokenClient;
 }
 
 export function createRegisterService({
   emailExternal: emailRepository,
   soptMemberRepository: soptMemberRepository,
   userRepository,
-  tokenService,
+  tokenClient,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
@@ -36,12 +36,12 @@ export function createRegisterService({
         return;
       }
 
-      const code = await tokenService.createRegisterToken(soptMember.id);
+      const code = await tokenClient.createRegisterToken(soptMember.id);
 
       await emailRepository.sendEmail(email, "SOPT 회원 인증", `code: ${code}`);
     },
     async getRegisterInfo(token) {
-      const registerTokenInfo = await tokenService.verifyRegisterToken(token);
+      const registerTokenInfo = await tokenClient.verifyRegisterToken(token);
       if (!registerTokenInfo) {
         return null;
       }
@@ -53,7 +53,7 @@ export function createRegisterService({
       };
     },
     async processRegister(token, data) {
-      const ret = await tokenService.verifyRegisterToken(token);
+      const ret = await tokenClient.verifyRegisterToken(token);
       if (!ret) {
         return { success: false };
       }

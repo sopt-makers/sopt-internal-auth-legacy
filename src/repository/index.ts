@@ -11,9 +11,6 @@ export interface Repository {
 
 interface RepositoryDeps {
   db: Database;
-  facebookAppId: string;
-  facebookAppSecret: string;
-  facebookAppRedirectUri: string;
 }
 
 export function createRepository({ db }: RepositoryDeps): Repository {

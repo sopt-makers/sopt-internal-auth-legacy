@@ -12,6 +12,7 @@ import {
 } from "./const";
 import { createDatabase } from "./database";
 import { createExternals } from "./external";
+import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
 import { createServices } from "./service";
@@ -29,9 +30,6 @@ import { createServices } from "./service";
 
   const repository = createRepository({
     db,
-    facebookAppId: FACEBOOK_APP_ID,
-    facebookAppRedirectUri: FACEBOOK_APP_REDIRECT_URI,
-    facebookAppSecret: FACEBOOK_APP_SECRET,
   });
 
   const externals = createExternals({
@@ -40,9 +38,14 @@ import { createServices } from "./service";
     facebookAppSecret: FACEBOOK_APP_SECRET,
   });
 
-  const services = createServices({ repository, externals, JWT_SECRET, ORIGIN });
+  const tokenClient = createTokenClient({
+    jwtSecret: JWT_SECRET,
+    origin: ORIGIN,
+  });
 
-  app.use("/api/v1", createRoutes({ services }));
+  const services = createServices({ repository, externals, tokenClient });
+
+  app.use("/api/v1", createRoutes({ services, tokenClient }));
 
   app.listen(PORT, () => {
     console.log(`Server Started: (http://localhost:${PORT})`);

@@ -1,8 +1,8 @@
 import { FacebookAPIExternal } from "../external/facebookAPI";
+import { TokenClient } from "../lib/token";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
-import { TokenService } from "./tokenService";
 
 export interface AuthService {
   authByFacebook(code: string): Promise<{ accessToken: string } | null>;
@@ -14,7 +14,7 @@ interface AuthServiceDeps {
   facebookAuthRepository: FacebookAuthRepository;
   userRepository: UserRepository;
   soptMemberRepository: SoptMemberRepsitory;
-  tokenService: TokenService;
+  tokenClient: TokenClient;
 }
 
 export function createAuthService({
@@ -22,7 +22,7 @@ export function createAuthService({
   facebookAuthRepository,
   userRepository,
   soptMemberRepository,
-  tokenService,
+  tokenClient,
 }: AuthServiceDeps): AuthService {
   return {
     async authByFacebook(code) {
@@ -38,14 +38,14 @@ export function createAuthService({
         return null;
       }
 
-      const accessToken = await tokenService.createAuthToken({ userId: userInfo.userId });
+      const accessToken = await tokenClient.createAuthToken({ userId: userInfo.userId });
 
       return {
         accessToken,
       };
     },
     async registerByFacebook(registerToken, code) {
-      const registerTokenInfo = await tokenService.verifyRegisterToken(registerToken);
+      const registerTokenInfo = await tokenClient.verifyRegisterToken(registerToken);
       const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
 
       if (!registerTokenInfo || !fbAccessToken) {
@@ -64,7 +64,7 @@ export function createAuthService({
       await soptMemberRepository.setUserId(registerTokenInfo.soptMemberId, createdUser.userId);
       await facebookAuthRepository.create({ authId: fbUserInfo.userId, userId: createdUser.userId });
 
-      const accessToken = await tokenService.createAuthToken({ userId: createdUser.userId });
+      const accessToken = await tokenClient.createAuthToken({ userId: createdUser.userId });
 
       return {
         accessToken,
