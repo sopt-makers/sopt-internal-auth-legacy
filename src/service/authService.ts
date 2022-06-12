@@ -5,8 +5,15 @@ import { SoptMemberRepsitory } from "../repository/soptPerson";
 import { UserRepository } from "../repository/user";
 
 export interface AuthService {
-  authByFacebook(code: string): Promise<{ accessToken: string } | null>;
-  registerByFacebook(registerToken: string, code: string): Promise<{ accessToken: string } | null>;
+  authByFacebook(
+    code: string,
+  ): Promise<{ success: true; accessToken: string } | { success: false; status: "invalidUser" | "idpFailed" }>;
+  registerByFacebook(
+    registerToken: string,
+    code: string,
+  ): Promise<
+    { success: true; accessToken: string } | { success: false; status: "idpFailed" | "tokenInvalid" | "alreadyTaken" }
+  >;
 }
 
 interface AuthServiceDeps {
@@ -28,38 +35,58 @@ export function createAuthService({
     async authByFacebook(code) {
       const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
       if (!fbAccessToken) {
-        return null;
+        return {
+          success: false,
+          status: "idpFailed",
+        };
       }
 
       const fbUserInfo = await facebookAPIExternal.getAccessTokenInfo(fbAccessToken);
 
       const userInfo = await facebookAuthRepository.findByAuthId(fbUserInfo.userId);
       if (!userInfo) {
-        return null;
+        return { success: false, status: "idpFailed" };
       }
 
       const accessToken = await tokenClient.createAuthToken({ userId: userInfo.userId });
 
-      return {
-        accessToken,
-      };
+      return { success: true, accessToken };
     },
     async registerByFacebook(registerToken, code) {
       const registerTokenInfo = await tokenClient.verifyRegisterToken(registerToken);
       const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
 
-      if (!registerTokenInfo || !fbAccessToken) {
-        return null;
+      if (!registerTokenInfo) {
+        return {
+          success: false,
+          status: "tokenInvalid",
+        };
+      }
+      if (!fbAccessToken) {
+        return {
+          success: false,
+          status: "idpFailed",
+        };
       }
 
       const fbUserInfo = await facebookAPIExternal.getAccessTokenInfo(fbAccessToken);
 
       const soptMemberInfo = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
-      if (!soptMemberInfo) {
-        return null;
+      if (soptMemberInfo === null) {
+        throw new Error(`Member id ${registerTokenInfo.soptMemberId} not found.`);
       }
 
-      const createdUser = await userRepository.createUser({ name: fbUserInfo.userName });
+      if (soptMemberInfo.userId !== null) {
+        return {
+          success: false,
+          status: "alreadyTaken",
+        };
+      }
+
+      const createdUser = await userRepository.createUser({
+        name: fbUserInfo.userName,
+        generation: soptMemberInfo.generation,
+      });
 
       await soptMemberRepository.setUserId(registerTokenInfo.soptMemberId, createdUser.userId);
       await facebookAuthRepository.create({ authId: fbUserInfo.userId, userId: createdUser.userId });
@@ -67,6 +94,7 @@ export function createAuthService({
       const accessToken = await tokenClient.createAuthToken({ userId: createdUser.userId });
 
       return {
+        success: true,
         accessToken,
       };
     },

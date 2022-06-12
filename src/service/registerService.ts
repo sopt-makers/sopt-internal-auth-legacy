@@ -1,44 +1,48 @@
 import { EmailExternal } from "../external/email";
 import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
-import { UserRepository } from "../repository/user";
 
 export interface RegisterService {
-  sendRegisterLinkByEmail(email: string): Promise<void>;
+  sendRegisterLinkByEmail(email: string): Promise<{ status: "success" | "invalidEmail" | "alreadyTaken" }>;
   getRegisterInfo(token: string): Promise<{
     name: string;
+    generation: number;
   } | null>;
-  processRegister(token: string, data: { name: string }): Promise<{ success: boolean }>;
 }
 
 interface RegisterServiceDeps {
   emailExternal: EmailExternal;
   soptMemberRepository: SoptMemberRepsitory;
-  userRepository: UserRepository;
   tokenClient: TokenClient;
 }
 
 export function createRegisterService({
   emailExternal: emailRepository,
   soptMemberRepository: soptMemberRepository,
-  userRepository,
   tokenClient,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
       const soptMember = await soptMemberRepository.findByEmail(email);
-
       if (!soptMember) {
-        return;
+        return {
+          status: "invalidEmail",
+        };
       }
 
       if (soptMember.userId !== null) {
-        return;
+        return {
+          status: "alreadyTaken",
+        };
       }
 
       const code = await tokenClient.createRegisterToken(soptMember.id);
 
       await emailRepository.sendEmail(email, "SOPT 회원 인증", `code: ${code}`);
+
+      return {
+        status: "success",
+      };
     },
     async getRegisterInfo(token) {
       const registerTokenInfo = await tokenClient.verifyRegisterToken(token);
@@ -47,24 +51,14 @@ export function createRegisterService({
       }
 
       const member = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
-
-      return {
-        name: member?.name ?? "",
-      };
-    },
-    async processRegister(token, data) {
-      const ret = await tokenClient.verifyRegisterToken(token);
-      if (!ret) {
-        return { success: false };
+      if (!member) {
+        return null;
       }
 
-      const member = await soptMemberRepository.findById(ret.soptMemberId);
-
-      await userRepository.createUser({
-        name: member?.name ?? data.name,
-      });
-
-      return { success: true };
+      return {
+        name: member.name ?? "",
+        generation: member.generation,
+      };
     },
   };
 }

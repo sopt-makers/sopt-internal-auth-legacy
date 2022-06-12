@@ -10,6 +10,7 @@ interface SoptMember {
   id: number;
   name: string | null;
   email: string;
+  generation: number;
   userId: number | null;
 }
 
@@ -22,7 +23,7 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
     async findByEmail(email) {
       const ret = await db
         .selectFrom("sopt_member")
-        .select(["name", "email", "user_id", "id"])
+        .select(["name", "email", "user_id", "id", "generation"])
         .where("email", "=", email)
         .executeTakeFirst();
 
@@ -32,6 +33,7 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
       return {
         id: ret.id ?? -1,
         name: ret.name ?? null,
+        generation: ret.generation,
         email: ret.email,
         userId: ret.user_id ?? null,
       };
@@ -39,7 +41,7 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
     async findById(id) {
       const ret = await db
         .selectFrom("sopt_member")
-        .select(["name", "email", "user_id", "id"])
+        .select(["name", "email", "user_id", "generation", "id"])
         .where("id", "=", id)
         .executeTakeFirst();
 
@@ -50,6 +52,7 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
       return {
         id: ret.id ?? -1,
         name: ret.name ?? null,
+        generation: ret.generation,
         email: ret.email,
         userId: ret.user_id ?? null,
       };

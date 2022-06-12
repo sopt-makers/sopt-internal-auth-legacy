@@ -3,9 +3,7 @@ import { Database } from "../database";
 
 export interface UserRepository {
   getUserByUserId(userId: number): Promise<Users | null>;
-
-  createUser(init: { name?: string }): Promise<{ userId: number }>;
-  setUserVerified(userId: number): Promise<void>;
+  createUser(init: { name: string; generation: number }): Promise<{ userId: number }>;
 }
 
 export function createUserRepository(db: Database): UserRepository {
@@ -18,9 +16,8 @@ export function createUserRepository(db: Database): UserRepository {
       const { id } = await db
         .insertInto("users")
         .values({
-          bio: "",
-          name: init.name ?? "",
-          is_sopt_member: false,
+          name: init.name,
+          generation: init.generation,
         })
         .returning("id")
         .executeTakeFirstOrThrow();
@@ -28,15 +25,6 @@ export function createUserRepository(db: Database): UserRepository {
       return {
         userId: Number(id),
       };
-    },
-    async setUserVerified(userId) {
-      await db
-        .updateTable("users")
-        .where("id", "=", userId)
-        .set({
-          is_sopt_member: true,
-        })
-        .executeTakeFirstOrThrow();
     },
   };
 }

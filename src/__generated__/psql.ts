@@ -4,18 +4,18 @@
  */
 export interface SoptMember {
   email: string;
+  generation: number;
   id?: number;
   name?: string | null;
   user_id?: number | null;
 }
 export interface Users {
-  bio: string;
+  email?: string | null;
+  generation: number;
   id?: number;
-  is_sopt_member?: boolean | null;
   name: string;
 }
 export interface UsersFacebookAuth {
-  facebook_access_token?: string | null;
   facebook_auth_id: string;
   id?: number;
   user_id: number;

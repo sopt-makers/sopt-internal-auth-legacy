@@ -4,7 +4,6 @@ export interface FacebookAuthRepository {
   findByUserId(userId: number): Promise<FBRecord | null>;
   findByAuthId(authId: string): Promise<FBRecord | null>;
   create(data: { authId: string; userId: number }): Promise<FBRecord>;
-  setAccessToken(authId: string, accessToken: string): Promise<void>;
 }
 
 interface FBRecord {
@@ -22,7 +21,7 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
     async findByUserId(userId) {
       const ret = await db
         .selectFrom("users_facebook_auth")
-        .select(["facebook_access_token", "facebook_auth_id", "user_id"])
+        .select(["facebook_auth_id", "user_id"])
         .where("user_id", "=", userId)
         .executeTakeFirst();
 
@@ -31,7 +30,6 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
       }
 
       return {
-        accessToken: ret.facebook_access_token ?? undefined,
         authId: ret.facebook_auth_id,
         userId: ret.user_id,
       };
@@ -39,7 +37,7 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
     async findByAuthId(authId) {
       const ret = await db
         .selectFrom("users_facebook_auth")
-        .select(["facebook_access_token", "facebook_auth_id", "user_id"])
+        .select(["facebook_auth_id", "user_id"])
         .where("facebook_auth_id", "=", authId)
         .executeTakeFirst();
 
@@ -48,7 +46,6 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
       }
 
       return {
-        accessToken: ret.facebook_access_token ?? undefined,
         authId: ret.facebook_auth_id,
         userId: ret.user_id,
       };
@@ -66,15 +63,6 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
         authId: authId,
         userId: userId,
       };
-    },
-    async setAccessToken(authId, accessToken) {
-      await db
-        .updateTable("users_facebook_auth")
-        .set({
-          facebook_access_token: accessToken,
-        })
-        .where("facebook_auth_id", "=", authId)
-        .execute();
     },
   };
 }
