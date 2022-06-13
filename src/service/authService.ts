@@ -33,7 +33,7 @@ export function createAuthService({
 }: AuthServiceDeps): AuthService {
   return {
     async authByFacebook(code) {
-      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
+      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code, "auth");
       if (!fbAccessToken) {
         return {
           success: false,
@@ -48,13 +48,15 @@ export function createAuthService({
         return { success: false, status: "idpFailed" };
       }
 
+      console.log(userInfo);
+
       const accessToken = await tokenClient.createAuthToken({ userId: userInfo.userId });
 
       return { success: true, accessToken };
     },
     async registerByFacebook(registerToken, code) {
       const registerTokenInfo = await tokenClient.verifyRegisterToken(registerToken);
-      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code);
+      const fbAccessToken = await facebookAPIExternal.getAccessTokenByCode(code, "register");
 
       if (!registerTokenInfo) {
         return {

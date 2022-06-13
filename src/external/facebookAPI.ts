@@ -2,7 +2,7 @@ import to from "await-to-js";
 import axios from "axios";
 
 export interface FacebookAPIExternal {
-  getAccessTokenByCode(code: string): Promise<string | null>;
+  getAccessTokenByCode(code: string, redirectType: "auth" | "register"): Promise<string | null>;
   getAccessTokenInfo(accessToken: string): Promise<{
     userId: string;
     userName: string;
@@ -20,17 +20,21 @@ export interface FacebookAPIExternal {
 
 interface FacebokAPIExternalDeps {
   clientAppId: string;
-  redirectUri: string;
+  redirectUriAuth: string;
+  redirectUriRegister: string;
   clientSecret: string;
 }
 
 export function createFacebookAPIExternal({
   clientAppId,
   clientSecret,
-  redirectUri,
+  redirectUriAuth,
+  redirectUriRegister,
 }: FacebokAPIExternalDeps): FacebookAPIExternal {
   return {
-    async getAccessTokenByCode(code) {
+    async getAccessTokenByCode(code, redirectType) {
+      const redirectUri = redirectType === "auth" ? redirectUriAuth : redirectUriRegister;
+
       const [err, ret] = await to(
         axios.get("https://graph.facebook.com/v13.0/oauth/access_token", {
           params: {

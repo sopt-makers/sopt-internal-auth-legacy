@@ -8,4 +8,5 @@ export const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 export const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID ?? "";
 export const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET ?? "";
-export const FACEBOOK_APP_REDIRECT_URI = process.env.FACEBOOK_APP_REDIRECT_URI ?? "";
+export const FACEBOOK_APP_REDIRECT_URI_AUTH = process.env.FACEBOOK_APP_REDIRECT_URI_AUTH ?? "";
+export const FACEBOOK_APP_REDIRECT_URI_REGISTER = process.env.FACEBOOK_APP_REDIRECT_URI_REGISTER ?? "";

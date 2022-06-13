@@ -16,11 +16,11 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
       const data = validateInput(
         req.body,
         z.object({
-          facebookAuthCode: z.string(),
+          code: z.string(),
         }),
       );
 
-      const ret = await services.authService.authByFacebook(data.facebookAuthCode);
+      const ret = await services.authService.authByFacebook(data.code);
 
       if (ret.success) {
         res.json({
@@ -28,11 +28,11 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
         });
       } else if (ret.status === "idpFailed") {
         res.status(403).json({
-          message: "인증에 실패했습니다.",
+          message: "로그인에 실패했습니다.",
         });
       } else if (ret.status === "invalidUser") {
         res.status(403).json({
-          message: "인증에 실패했습니다.",
+          message: "로그인에 실패했습니다.",
         });
       }
     }),

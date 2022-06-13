@@ -9,19 +9,22 @@ export interface Externals {
 interface ExternalsDeps {
   facebookAppId: string;
   facebookAppSecret: string;
-  facebookAppRedirectUri: string;
+  facebookAppRedirectUriAuth: string;
+  facebookAppRedirectUriRegister: string;
 }
 
 export function createExternals({
   facebookAppId,
   facebookAppSecret,
-  facebookAppRedirectUri,
+  facebookAppRedirectUriAuth,
+  facebookAppRedirectUriRegister,
 }: ExternalsDeps): Externals {
   return {
     email: createEmailExternal({ senderAddress: "asdf" }),
     facebookAPI: createFacebookAPIExternal({
       clientAppId: facebookAppId,
-      redirectUri: facebookAppRedirectUri,
+      redirectUriAuth: facebookAppRedirectUriAuth,
+      redirectUriRegister: facebookAppRedirectUriRegister,
       clientSecret: facebookAppSecret,
     }),
   };

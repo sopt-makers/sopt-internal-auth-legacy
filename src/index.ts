@@ -1,10 +1,12 @@
 import cors from "cors";
 import express from "express";
+import morgan from "morgan";
 
 import {
   DATABASE_URI,
   FACEBOOK_APP_ID,
-  FACEBOOK_APP_REDIRECT_URI,
+  FACEBOOK_APP_REDIRECT_URI_AUTH,
+  FACEBOOK_APP_REDIRECT_URI_REGISTER,
   FACEBOOK_APP_SECRET,
   JWT_SECRET,
   ORIGIN,
@@ -24,6 +26,8 @@ import { createServices } from "./service";
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  app.use(morgan("dev"));
+
   const db = createDatabase({
     DATABASE_URI,
   });
@@ -34,7 +38,8 @@ import { createServices } from "./service";
 
   const externals = createExternals({
     facebookAppId: FACEBOOK_APP_ID,
-    facebookAppRedirectUri: FACEBOOK_APP_REDIRECT_URI,
+    facebookAppRedirectUriAuth: FACEBOOK_APP_REDIRECT_URI_AUTH,
+    facebookAppRedirectUriRegister: FACEBOOK_APP_REDIRECT_URI_REGISTER,
     facebookAppSecret: FACEBOOK_APP_SECRET,
   });
 
