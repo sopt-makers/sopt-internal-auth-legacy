@@ -5,10 +5,14 @@ import { SoptMemberRepsitory } from "../repository/soptPerson";
 
 export interface RegisterService {
   sendRegisterLinkByEmail(email: string): Promise<{ status: "success" | "invalidEmail" | "alreadyTaken" }>;
-  getRegisterInfo(token: string): Promise<{
-    name: string;
-    generation: number;
-  } | null>;
+  getRegisterInfo(token: string): Promise<
+    | {
+        success: true;
+        name: string;
+        generation: number;
+      }
+    | { success: false }
+  >;
 }
 
 interface RegisterServiceDeps {
@@ -58,15 +62,16 @@ export function createRegisterService({
     async getRegisterInfo(token) {
       const registerTokenInfo = await tokenClient.verifyRegisterToken(token);
       if (!registerTokenInfo) {
-        return null;
+        return { success: false };
       }
 
       const member = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
       if (!member) {
-        return null;
+        return { success: false };
       }
 
       return {
+        success: true,
         name: member.name ?? "",
         generation: member.generation,
       };

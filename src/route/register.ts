@@ -23,9 +23,9 @@ export function createRegisterRoute({ services }: RegisterRouteDeps) {
 
       const ret = await services.registerService.getRegisterInfo(data.registerToken);
 
-      if (ret === null) {
+      if (!ret.success) {
         res.status(403).json({
-          message: "register token이 유효하지 않습니다.",
+          message: "가입 토큰이 유효하지 않습니다.",
         });
         return;
       }
