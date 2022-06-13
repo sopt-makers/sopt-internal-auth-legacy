@@ -4,6 +4,10 @@ import morgan from "morgan";
 
 import {
   DATABASE_URI,
+  EMAIL_HOST,
+  EMAIL_PASS,
+  EMAIL_SENDER_ADDRESS,
+  EMAIL_USER,
   FACEBOOK_APP_ID,
   FACEBOOK_APP_REDIRECT_URI_AUTH,
   FACEBOOK_APP_REDIRECT_URI_REGISTER,
@@ -14,7 +18,8 @@ import {
   REGISTER_PAGE_URI_TEMPLATE,
 } from "./const";
 import { createDatabase } from "./database";
-import { createExternals } from "./external";
+import { createEmailExternal } from "./external/email";
+import { createFacebookAPIExternal } from "./external/facebookAPI";
 import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
@@ -37,11 +42,18 @@ import { createServices } from "./service";
     db,
   });
 
-  const externals = createExternals({
-    facebookAppId: FACEBOOK_APP_ID,
-    facebookAppRedirectUriAuth: FACEBOOK_APP_REDIRECT_URI_AUTH,
-    facebookAppRedirectUriRegister: FACEBOOK_APP_REDIRECT_URI_REGISTER,
-    facebookAppSecret: FACEBOOK_APP_SECRET,
+  const emailExternal = createEmailExternal({
+    emailHost: EMAIL_HOST,
+    emailPass: EMAIL_PASS,
+    emailUser: EMAIL_USER,
+    emailSenderAddress: EMAIL_SENDER_ADDRESS,
+  });
+
+  const facebookAPIExternal = createFacebookAPIExternal({
+    clientAppId: FACEBOOK_APP_ID,
+    redirectUriAuth: FACEBOOK_APP_REDIRECT_URI_AUTH,
+    redirectUriRegister: FACEBOOK_APP_REDIRECT_URI_REGISTER,
+    clientSecret: FACEBOOK_APP_SECRET,
   });
 
   const tokenClient = createTokenClient({
@@ -51,7 +63,10 @@ import { createServices } from "./service";
 
   const services = createServices({
     repository,
-    externals,
+    externals: {
+      email: emailExternal,
+      facebookAPI: facebookAPIExternal,
+    },
     tokenClient,
     registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,
   });

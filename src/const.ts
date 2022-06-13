@@ -24,3 +24,4 @@ export const FACEBOOK_APP_REDIRECT_URI_REGISTER = required("FACEBOOK_APP_REDIREC
 export const EMAIL_HOST = required("EMAIL_HOST");
 export const EMAIL_USER = required("EMAIL_USER");
 export const EMAIL_PASS = required("EMAIL_PASS");
+export const EMAIL_SENDER_ADDRESS = required("EMAIL_SENDER_ADDRESS");

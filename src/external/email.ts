@@ -5,24 +5,32 @@ export interface EmailExternal {
 }
 
 interface EmailExternalDeps {
-  senderAddress: string;
+  emailSenderAddress: string;
+  emailHost: string;
+  emailUser: string;
+  emailPass: string;
 }
 
-export function createEmailExternal({ senderAddress }: EmailExternalDeps): EmailExternal {
+export function createEmailExternal({
+  emailSenderAddress,
+  emailHost,
+  emailUser,
+  emailPass,
+}: EmailExternalDeps): EmailExternal {
   const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
+    host: emailHost,
     port: 587,
     secure: false,
     auth: {
-      user: "tracy.farrell29@ethereal.email",
-      pass: "NAECkdf8j4yxgMjJhz",
+      user: emailUser,
+      pass: emailPass,
     },
   });
 
   return {
     async sendEmail(to, subject, html) {
       const res = await transporter.sendMail({
-        sender: `<${senderAddress}>`,
+        sender: `<${emailSenderAddress}>`,
         to: to,
         subject,
         html,
