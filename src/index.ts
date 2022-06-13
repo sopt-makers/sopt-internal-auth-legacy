@@ -11,6 +11,7 @@ import {
   JWT_SECRET,
   ORIGIN,
   PORT,
+  REGISTER_PAGE_URI_TEMPLATE,
 } from "./const";
 import { createDatabase } from "./database";
 import { createExternals } from "./external";
@@ -48,7 +49,12 @@ import { createServices } from "./service";
     origin: ORIGIN,
   });
 
-  const services = createServices({ repository, externals, tokenClient });
+  const services = createServices({
+    repository,
+    externals,
+    tokenClient,
+    registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,
+  });
 
   app.use("/api/v1", createRoutes({ services, tokenClient }));
 

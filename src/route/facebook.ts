@@ -28,11 +28,11 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
         });
       } else if (ret.status === "idpFailed") {
         res.status(403).json({
-          message: "로그인에 실패했습니다.",
+          message: "Facebook 인증에 실패했습니다.",
         });
       } else if (ret.status === "invalidUser") {
         res.status(403).json({
-          message: "로그인에 실패했습니다.",
+          message: "SOPT.org 회원이 아닙니다.",
         });
       }
     }),

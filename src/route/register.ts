@@ -56,7 +56,7 @@ export function createRegisterRoute({ services }: RegisterRouteDeps) {
       } else if (ret.status === "alreadyTaken") {
         res.status(409).json({
           success: false,
-          message: "인증되지 않은 이메일입니다.",
+          message: "가입할 수 없는 이메일입니다.",
         });
       } else if (ret.status === "invalidEmail") {
         res.status(409).json({

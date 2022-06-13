@@ -45,10 +45,8 @@ export function createAuthService({
 
       const userInfo = await facebookAuthRepository.findByAuthId(fbUserInfo.userId);
       if (!userInfo) {
-        return { success: false, status: "idpFailed" };
+        return { success: false, status: "invalidUser" };
       }
-
-      console.log(userInfo);
 
       const accessToken = await tokenClient.createAuthToken({ userId: userInfo.userId });
 

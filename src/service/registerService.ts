@@ -1,3 +1,4 @@
+import { createRegisterEmailHTML } from "../assets/emailTemplate";
 import { EmailExternal } from "../external/email";
 import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptPerson";
@@ -14,12 +15,14 @@ interface RegisterServiceDeps {
   emailExternal: EmailExternal;
   soptMemberRepository: SoptMemberRepsitory;
   tokenClient: TokenClient;
+  registerPageUriTemplate: string;
 }
 
 export function createRegisterService({
   emailExternal: emailRepository,
   soptMemberRepository: soptMemberRepository,
   tokenClient,
+  registerPageUriTemplate,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
@@ -36,9 +39,17 @@ export function createRegisterService({
         };
       }
 
-      const code = await tokenClient.createRegisterToken(soptMember.id);
+      const token = await tokenClient.createRegisterToken(soptMember.id);
 
-      await emailRepository.sendEmail(email, "SOPT 회원 인증", `code: ${code}`);
+      await emailRepository.sendEmail(
+        email,
+        "SOPT 회원 인증",
+        createRegisterEmailHTML({
+          name: soptMember.name ?? "이름 없음",
+          registerPageUriTemplate,
+          token,
+        }),
+      );
 
       return {
         status: "success",

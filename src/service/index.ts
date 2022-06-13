@@ -13,9 +13,15 @@ interface CreateServicesDeps {
   repository: Repository;
   externals: Externals;
   tokenClient: TokenClient;
+  registerPageUriTemplate: string;
 }
 
-export function createServices({ repository, externals, tokenClient }: CreateServicesDeps): Services {
+export function createServices({
+  repository,
+  externals,
+  tokenClient,
+  registerPageUriTemplate,
+}: CreateServicesDeps): Services {
   return {
     authService: createAuthService({
       facebookAPIExternal: externals.facebookAPI,
@@ -28,6 +34,7 @@ export function createServices({ repository, externals, tokenClient }: CreateSer
       emailExternal: externals.email,
       soptMemberRepository: repository.soptMember,
       tokenClient: tokenClient,
+      registerPageUriTemplate,
     }),
   };
 }
