@@ -1,7 +1,7 @@
 import { createRegisterEmailHTML } from "../assets/emailTemplate";
 import { EmailExternal } from "../external/email";
 import { TokenClient } from "../lib/token";
-import { SoptMemberRepsitory } from "../repository/soptPerson";
+import { SoptMemberRepsitory } from "../repository/soptMember";
 
 export interface RegisterService {
   sendRegisterLinkByEmail(email: string): Promise<{ status: "success" | "invalidEmail" | "alreadyTaken" }>;

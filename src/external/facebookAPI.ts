@@ -7,15 +7,6 @@ export interface FacebookAPIExternal {
     userId: string;
     userName: string;
   }>;
-  getGroupInfo(
-    userId: string,
-    accessToken: string,
-  ): Promise<
-    Array<{
-      groupId: string;
-      groupName: string;
-    }>
-  >;
 }
 
 interface FacebokAPIExternalDeps {
@@ -78,34 +69,6 @@ export function createFacebookAPIExternal({
         userId: data.id,
         userName: data.name,
       };
-    },
-    async getGroupInfo(facebookuUerId: string, accessToken: string) {
-      interface Group {
-        name: string;
-        id: string;
-      }
-
-      const [err, res] = await to(
-        axios.get(`https://graph.facebook.com/v13.0/${facebookuUerId}/groups`, {
-          params: {
-            access_token: accessToken,
-          },
-        }),
-      );
-
-      if (err) {
-        if (axios.isAxiosError(err)) {
-          console.log(err.response?.data);
-        }
-        throw err;
-      }
-
-      const groups: Group[] = res.data.data;
-
-      return groups.map((group) => ({
-        groupId: group.id,
-        groupName: group.name,
-      }));
     },
   };
 }

@@ -1,6 +1,6 @@
 import { Database } from "../database";
 import { createFacebookAuthRepository, FacebookAuthRepository } from "./facebookAuth";
-import { createSoptMemberRepsitory, SoptMemberRepsitory } from "./soptPerson";
+import { createSoptMemberRepsitory, SoptMemberRepsitory } from "./soptMember";
 import { createUserRepository, UserRepository } from "./user";
 
 export interface Repository {

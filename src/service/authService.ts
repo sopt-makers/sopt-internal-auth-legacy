@@ -1,7 +1,7 @@
 import { FacebookAPIExternal } from "../external/facebookAPI";
 import { TokenClient } from "../lib/token";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
-import { SoptMemberRepsitory } from "../repository/soptPerson";
+import { SoptMemberRepsitory } from "../repository/soptMember";
 import { UserRepository } from "../repository/user";
 
 export interface AuthService {
