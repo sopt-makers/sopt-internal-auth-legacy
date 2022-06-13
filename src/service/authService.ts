@@ -1,4 +1,5 @@
 import { FacebookAPIExternal } from "../external/facebookAPI";
+import { WebHookExternal } from "../external/webHook";
 import { TokenClient } from "../lib/token";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
 import { SoptMemberRepsitory } from "../repository/soptMember";
@@ -18,6 +19,7 @@ export interface AuthService {
 
 interface AuthServiceDeps {
   facebookAPIExternal: FacebookAPIExternal;
+  webHookExternal: WebHookExternal;
   facebookAuthRepository: FacebookAuthRepository;
   userRepository: UserRepository;
   soptMemberRepository: SoptMemberRepsitory;
@@ -26,6 +28,7 @@ interface AuthServiceDeps {
 
 export function createAuthService({
   facebookAPIExternal,
+  webHookExternal,
   facebookAuthRepository,
   userRepository,
   soptMemberRepository,
@@ -84,7 +87,7 @@ export function createAuthService({
       }
 
       const createdUser = await userRepository.createUser({
-        name: fbUserInfo.userName,
+        name: soptMemberInfo.name ?? "알 수 없음",
         generation: soptMemberInfo.generation,
       });
 
@@ -92,6 +95,12 @@ export function createAuthService({
       await facebookAuthRepository.create({ authId: fbUserInfo.userId, userId: createdUser.userId });
 
       const accessToken = await tokenClient.createAuthToken({ userId: createdUser.userId });
+
+      await webHookExternal.callOnRegister({
+        userId: createdUser.userId,
+        name: createdUser.name,
+        generation: createdUser.generation,
+      });
 
       return {
         success: true,

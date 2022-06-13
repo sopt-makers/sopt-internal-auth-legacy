@@ -16,10 +16,12 @@ import {
   ORIGIN,
   PORT,
   REGISTER_PAGE_URI_TEMPLATE,
+  WEBHOOK_ON_REGISTER,
 } from "./const";
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
+import { createWebHookExternal } from "./external/webHook";
 import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
@@ -56,6 +58,10 @@ import { createServices } from "./service";
     clientSecret: FACEBOOK_APP_SECRET,
   });
 
+  const webHookExternal = createWebHookExternal({
+    onRegisterTargets: WEBHOOK_ON_REGISTER,
+  });
+
   const tokenClient = createTokenClient({
     jwtSecret: JWT_SECRET,
     origin: ORIGIN,
@@ -66,6 +72,7 @@ import { createServices } from "./service";
     externals: {
       email: emailExternal,
       facebookAPI: facebookAPIExternal,
+      webHook: webHookExternal,
     },
     tokenClient,
     registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,

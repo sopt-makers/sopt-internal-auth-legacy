@@ -25,6 +25,7 @@ export function createServices({
   return {
     authService: createAuthService({
       facebookAPIExternal: externals.facebookAPI,
+      webHookExternal: externals.webHook,
       facebookAuthRepository: repository.facebookAuth,
       userRepository: repository.user,
       soptMemberRepository: repository.soptMember,

@@ -3,7 +3,7 @@ import { Database } from "../database";
 
 export interface UserRepository {
   getUserByUserId(userId: number): Promise<Users | null>;
-  createUser(init: { name: string; generation: number }): Promise<{ userId: number }>;
+  createUser(init: { name: string; generation: number }): Promise<{ userId: number; name: string; generation: number }>;
 }
 
 export function createUserRepository(db: Database): UserRepository {
@@ -24,6 +24,8 @@ export function createUserRepository(db: Database): UserRepository {
 
       return {
         userId: Number(id),
+        name: init.name,
+        generation: init.generation,
       };
     },
   };

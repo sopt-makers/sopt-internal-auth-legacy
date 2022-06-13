@@ -23,8 +23,8 @@ interface RegisterServiceDeps {
 }
 
 export function createRegisterService({
-  emailExternal: emailRepository,
-  soptMemberRepository: soptMemberRepository,
+  emailExternal,
+  soptMemberRepository,
   tokenClient,
   registerPageUriTemplate,
 }: RegisterServiceDeps): RegisterService {
@@ -45,7 +45,7 @@ export function createRegisterService({
 
       const token = await tokenClient.createRegisterToken(soptMember.id);
 
-      await emailRepository.sendEmail(
+      await emailExternal.sendEmail(
         email,
         "SOPT 회원 인증",
         createRegisterEmailHTML({
