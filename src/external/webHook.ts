@@ -14,12 +14,12 @@ export function createWebHookExternal({ onRegisterTargets }: WebHookExternalDeps
       const tasks = onRegisterTargets.map((target) =>
         axios
           .post(target, {
-            userId: data.userId,
+            auth_user_id: data.userId,
             name: data.name,
             generation: data.generation,
           })
           .catch(() => {
-            //
+            // 웹훅 호출 에러 일단 처리하지 않음
           }),
       );
 
