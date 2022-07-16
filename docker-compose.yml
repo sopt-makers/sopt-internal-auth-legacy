@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:14.2-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_DB=sopt-auth
+      - POSTGRES_USER=sopt
+      - POSTGRES_PASSWORD=sopt
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
