@@ -1,10 +1,14 @@
+import to from "await-to-js";
+
 import { createRegisterEmailHTML } from "../assets/emailTemplate";
 import { EmailExternal } from "../external/email";
 import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptMember";
 
 export interface RegisterService {
-  sendRegisterLinkByEmail(email: string): Promise<{ status: "success" | "invalidEmail" | "alreadyTaken" }>;
+  sendRegisterLinkByEmail(
+    email: string,
+  ): Promise<{ status: "success" | "invalidEmail" | "alreadyTaken" | "cannotSendEmail" }>;
   getRegisterInfo(token: string): Promise<
     | {
         success: true;
@@ -45,15 +49,23 @@ export function createRegisterService({
 
       const token = await tokenClient.createRegisterToken(soptMember.id);
 
-      await emailExternal.sendEmail(
-        email,
-        "SOPT 회원 인증",
-        createRegisterEmailHTML({
-          name: soptMember.name ?? "이름 없음",
-          registerPageUriTemplate,
-          token,
-        }),
+      const [err] = await to(
+        emailExternal.sendEmail(
+          email,
+          "SOPT 회원 인증",
+          createRegisterEmailHTML({
+            name: soptMember.name ?? "이름 없음",
+            registerPageUriTemplate,
+            token,
+          }),
+        ),
       );
+
+      if (err) {
+        return {
+          status: "cannotSendEmail",
+        };
+      }
 
       return {
         status: "success",
