@@ -24,7 +24,8 @@ export function createRoutes({ services }: CreateRoutesDeps) {
     if (err instanceof ZodValidationError) {
       res.status(400).json({ message: "올바르지 않은 입력 형식입니다.", errors: err.zodError.format() });
     } else {
-      res.status(500).json({ message: "Internal Server Error", reason: err + "" });
+      res.status(500).json({ message: "Internal Server Error" });
+      console.error("[Error]: Internal Server Error:", err.message);
     }
   });
 
