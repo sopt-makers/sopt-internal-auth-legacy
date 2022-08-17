@@ -14,7 +14,6 @@ interface CreateServicesDeps {
   repository: Repository;
   externals: Externals;
   tokenClient: TokenClient;
-  registerPageUriTemplate: string;
   config: ServerConfig;
 }
 

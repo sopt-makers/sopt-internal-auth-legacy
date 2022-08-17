@@ -12,6 +12,14 @@ export const configDef = {
     redirectUriRegister: z.string(),
     clientSecret: z.string(),
   }),
+  EMAIL_CONFIG: z.object({
+    senderAddress: z.string(),
+    host: z.string(),
+    user: z.string(),
+    pass: z.string(),
+    port: z.number(),
+    secure: z.boolean(),
+  }),
 };
 
 export function createServerConfig(configRepository: ConfigRepository) {

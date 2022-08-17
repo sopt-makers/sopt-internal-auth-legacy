@@ -3,22 +3,7 @@ import express from "express";
 import morgan from "morgan";
 
 import { configDef } from "./config";
-import {
-  DATABASE_URI,
-  EMAIL_HOST,
-  EMAIL_PASS,
-  EMAIL_SENDER_ADDRESS,
-  EMAIL_USER,
-  FACEBOOK_APP_ID,
-  FACEBOOK_APP_REDIRECT_URI_AUTH,
-  FACEBOOK_APP_REDIRECT_URI_REGISTER,
-  FACEBOOK_APP_SECRET,
-  JWT_SECRET,
-  ORIGIN,
-  PORT,
-  REGISTER_PAGE_URI_TEMPLATE,
-  WEBHOOK_ON_REGISTER,
-} from "./const";
+import { DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./const";
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
@@ -48,11 +33,8 @@ import { createServices } from "./service";
 
   const config = createDBConfigStore({ configRepository: repository.config }, configDef);
 
-  const emailExternal = createEmailExternal({
-    emailHost: EMAIL_HOST,
-    emailPass: EMAIL_PASS,
-    emailUser: EMAIL_USER,
-    emailSenderAddress: EMAIL_SENDER_ADDRESS,
+  const emailExternal = await createEmailExternal({
+    config,
   });
 
   const facebookAPIExternal = createFacebookAPIExternal({
@@ -60,7 +42,7 @@ import { createServices } from "./service";
   });
 
   const webHookExternal = createWebHookExternal({
-    onRegisterTargets: WEBHOOK_ON_REGISTER,
+    config,
   });
 
   const tokenClient = createTokenClient({
@@ -76,7 +58,6 @@ import { createServices } from "./service";
       webHook: webHookExternal,
     },
     tokenClient,
-    registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,
     config,
   });
 

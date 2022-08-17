@@ -1,36 +1,32 @@
 import nodemailer from "nodemailer";
 
+import { ServerConfig } from "../config";
+
 export interface EmailExternal {
   sendEmail(to: string, subject: string, html: string): Promise<{ accepted: unknown[] }>;
 }
 
 interface EmailExternalDeps {
-  emailSenderAddress: string;
-  emailHost: string;
-  emailUser: string;
-  emailPass: string;
+  config: ServerConfig;
 }
 
-export function createEmailExternal({
-  emailSenderAddress,
-  emailHost,
-  emailUser,
-  emailPass,
-}: EmailExternalDeps): EmailExternal {
+export async function createEmailExternal({ config }: EmailExternalDeps): Promise<EmailExternal> {
+  const { host, port, secure, user, pass, senderAddress } = await config.get("EMAIL_CONFIG");
+
   const transporter = nodemailer.createTransport({
-    host: emailHost,
-    port: 465,
-    secure: true,
+    host,
+    port,
+    secure,
     auth: {
-      user: emailUser,
-      pass: emailPass,
+      user,
+      pass,
     },
   });
 
   return {
     async sendEmail(to, subject, html) {
       const res = await transporter.sendMail({
-        sender: `<${emailSenderAddress}>`,
+        sender: `<${senderAddress}>`,
         to: to,
         subject,
         html,
