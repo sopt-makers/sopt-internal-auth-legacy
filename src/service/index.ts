@@ -1,3 +1,4 @@
+import { ServerConfig } from "../config";
 import { Externals } from "../external";
 import { TokenClient } from "../lib/token";
 import { Repository } from "../repository";
@@ -14,14 +15,10 @@ interface CreateServicesDeps {
   externals: Externals;
   tokenClient: TokenClient;
   registerPageUriTemplate: string;
+  config: ServerConfig;
 }
 
-export function createServices({
-  repository,
-  externals,
-  tokenClient,
-  registerPageUriTemplate,
-}: CreateServicesDeps): Services {
+export function createServices({ repository, externals, tokenClient, config }: CreateServicesDeps): Services {
   return {
     authService: createAuthService({
       facebookAPIExternal: externals.facebookAPI,
@@ -35,7 +32,7 @@ export function createServices({
       emailExternal: externals.email,
       soptMemberRepository: repository.soptMember,
       tokenClient: tokenClient,
-      registerPageUriTemplate,
+      config,
     }),
   };
 }

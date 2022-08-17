@@ -22,3 +22,11 @@ CREATE TABLE sopt_member (
 
   UNIQUE (name, generation, email)
 );
+
+CREATE TABLE auth_server_config (
+  id SERIAL PRIMARY KEY,
+  key VARCHAR(30) NOT NULL,
+  value TEXT NOT NULL,
+
+  UNIQUE (key)
+);

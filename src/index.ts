@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 
+import { configDef } from "./config";
 import {
   DATABASE_URI,
   EMAIL_HOST,
@@ -22,6 +23,7 @@ import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
 import { createWebHookExternal } from "./external/webHook";
+import { createDBConfigStore } from "./lib/configStore/dbConfigStore";
 import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
@@ -44,6 +46,8 @@ import { createServices } from "./service";
     db,
   });
 
+  const config = createDBConfigStore({ configRepository: repository.config }, configDef);
+
   const emailExternal = createEmailExternal({
     emailHost: EMAIL_HOST,
     emailPass: EMAIL_PASS,
@@ -52,10 +56,7 @@ import { createServices } from "./service";
   });
 
   const facebookAPIExternal = createFacebookAPIExternal({
-    clientAppId: FACEBOOK_APP_ID,
-    redirectUriAuth: FACEBOOK_APP_REDIRECT_URI_AUTH,
-    redirectUriRegister: FACEBOOK_APP_REDIRECT_URI_REGISTER,
-    clientSecret: FACEBOOK_APP_SECRET,
+    config,
   });
 
   const webHookExternal = createWebHookExternal({
@@ -76,6 +77,7 @@ import { createServices } from "./service";
     },
     tokenClient,
     registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,
+    config,
   });
 
   app.use("/api/v1", createRoutes({ services, tokenClient }));

@@ -19,8 +19,8 @@ export function createEmailExternal({
 }: EmailExternalDeps): EmailExternal {
   const transporter = nodemailer.createTransport({
     host: emailHost,
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
       user: emailUser,
       pass: emailPass,
