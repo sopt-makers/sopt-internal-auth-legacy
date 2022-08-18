@@ -1,6 +1,8 @@
 import to from "await-to-js";
 import axios from "axios";
 
+import { ServerConfig } from "../config";
+
 export interface FacebookAPIExternal {
   getAccessTokenByCode(code: string, redirectType: "auth" | "register"): Promise<string | null>;
   getAccessTokenInfo(accessToken: string): Promise<{
@@ -10,20 +12,14 @@ export interface FacebookAPIExternal {
 }
 
 interface FacebokAPIExternalDeps {
-  clientAppId: string;
-  redirectUriAuth: string;
-  redirectUriRegister: string;
-  clientSecret: string;
+  config: ServerConfig;
 }
 
-export function createFacebookAPIExternal({
-  clientAppId,
-  clientSecret,
-  redirectUriAuth,
-  redirectUriRegister,
-}: FacebokAPIExternalDeps): FacebookAPIExternal {
+export function createFacebookAPIExternal({ config }: FacebokAPIExternalDeps): FacebookAPIExternal {
   return {
     async getAccessTokenByCode(code, redirectType) {
+      const { redirectUriAuth, redirectUriRegister, clientAppId, clientSecret } = await config.get("FACEBOOK_OAUTH");
+
       const redirectUri = redirectType === "auth" ? redirectUriAuth : redirectUriRegister;
 
       const [err, ret] = await to(

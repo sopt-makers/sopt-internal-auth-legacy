@@ -2,22 +2,8 @@ import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 
-import {
-  DATABASE_URI,
-  EMAIL_HOST,
-  EMAIL_PASS,
-  EMAIL_SENDER_ADDRESS,
-  EMAIL_USER,
-  FACEBOOK_APP_ID,
-  FACEBOOK_APP_REDIRECT_URI_AUTH,
-  FACEBOOK_APP_REDIRECT_URI_REGISTER,
-  FACEBOOK_APP_SECRET,
-  JWT_SECRET,
-  ORIGIN,
-  PORT,
-  REGISTER_PAGE_URI_TEMPLATE,
-  WEBHOOK_ON_REGISTER,
-} from "./const";
+import { createServerConfig } from "./config";
+import { ADMIN_ACCESS_TOKEN, DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./const";
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
@@ -44,22 +30,18 @@ import { createServices } from "./service";
     db,
   });
 
-  const emailExternal = createEmailExternal({
-    emailHost: EMAIL_HOST,
-    emailPass: EMAIL_PASS,
-    emailUser: EMAIL_USER,
-    emailSenderAddress: EMAIL_SENDER_ADDRESS,
+  const config = createServerConfig(repository.config);
+
+  const emailExternal = await createEmailExternal({
+    config,
   });
 
   const facebookAPIExternal = createFacebookAPIExternal({
-    clientAppId: FACEBOOK_APP_ID,
-    redirectUriAuth: FACEBOOK_APP_REDIRECT_URI_AUTH,
-    redirectUriRegister: FACEBOOK_APP_REDIRECT_URI_REGISTER,
-    clientSecret: FACEBOOK_APP_SECRET,
+    config,
   });
 
   const webHookExternal = createWebHookExternal({
-    onRegisterTargets: WEBHOOK_ON_REGISTER,
+    config,
   });
 
   const tokenClient = createTokenClient({
@@ -75,10 +57,10 @@ import { createServices } from "./service";
       webHook: webHookExternal,
     },
     tokenClient,
-    registerPageUriTemplate: REGISTER_PAGE_URI_TEMPLATE,
+    config,
   });
 
-  app.use("/api/v1", createRoutes({ services, tokenClient }));
+  app.use("/api/v1", createRoutes({ services, adminAccessToken: ADMIN_ACCESS_TOKEN }));
 
   app.listen(PORT, () => {
     console.log(`Server Started: (http://localhost:${PORT})`);

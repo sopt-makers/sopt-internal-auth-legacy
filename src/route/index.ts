@@ -1,20 +1,21 @@
 import { NextFunction, Request, Response, Router } from "express";
 
-import { TokenClient } from "../lib/token";
 import { Services } from "../service";
 import { ZodValidationError } from "../util/route";
 import { createFacebookRoute } from "./facebook";
 import { createRegisterRoute } from "./register";
+import { createServerInternalRoute } from "./serverInternal";
 interface CreateRoutesDeps {
   services: Services;
-  tokenClient: TokenClient;
+  adminAccessToken: string;
 }
 
-export function createRoutes({ services }: CreateRoutesDeps) {
+export function createRoutes({ services, adminAccessToken }: CreateRoutesDeps) {
   const router = Router();
 
   router.use("/idp/facebook", createFacebookRoute({ services }));
   router.use("/register", createRegisterRoute({ services }));
+  router.use("/serverInternal", createServerInternalRoute({ services, adminAccessToken }));
 
   router.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {

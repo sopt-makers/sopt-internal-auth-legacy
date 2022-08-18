@@ -1,6 +1,7 @@
 import to from "await-to-js";
 
 import { createRegisterEmailHTML } from "../assets/emailTemplate";
+import { ServerConfig } from "../config";
 import { EmailExternal } from "../external/email";
 import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptMember";
@@ -23,14 +24,14 @@ interface RegisterServiceDeps {
   emailExternal: EmailExternal;
   soptMemberRepository: SoptMemberRepsitory;
   tokenClient: TokenClient;
-  registerPageUriTemplate: string;
+  config: ServerConfig;
 }
 
 export function createRegisterService({
   emailExternal,
   soptMemberRepository,
   tokenClient,
-  registerPageUriTemplate,
+  config,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
@@ -55,13 +56,14 @@ export function createRegisterService({
           "SOPT 회원 인증",
           createRegisterEmailHTML({
             name: soptMember.name ?? "이름 없음",
-            registerPageUriTemplate,
+            registerPageUriTemplate: await config.get("REGISTER_PAGE_URL_TEMPLATE"),
             token,
           }),
         ),
       );
 
       if (err) {
+        console.log(err);
         return {
           status: "cannotSendEmail",
         };

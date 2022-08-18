@@ -9,6 +9,7 @@ display: inline-block;
 line-height: 48px;
 text-decoration: none;
 font-size: 16px;
+border-radius: 6px;
 `;
 
 export function createRegisterEmailHTML(data: { name: string; token: string; registerPageUriTemplate: string }) {

@@ -1,16 +1,20 @@
 import axios from "axios";
 
+import { ServerConfig } from "../config";
+
 export interface WebHookExternal {
   callOnRegister(data: { userId: number; name: string; generation: number }): Promise<void>;
 }
 
 interface WebHookExternalDeps {
-  onRegisterTargets: string[];
+  config: ServerConfig;
 }
 
-export function createWebHookExternal({ onRegisterTargets }: WebHookExternalDeps): WebHookExternal {
+export function createWebHookExternal({ config }: WebHookExternalDeps): WebHookExternal {
   return {
     async callOnRegister(data) {
+      const onRegisterTargets = await config.get("WEBHOOK_ON_REGISTER");
+
       const tasks = onRegisterTargets.map((target) =>
         axios
           .post(target, {
