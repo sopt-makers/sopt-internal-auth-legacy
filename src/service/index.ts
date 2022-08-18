@@ -2,9 +2,9 @@ import { ServerConfig } from "../config";
 import { Externals } from "../external";
 import { TokenClient } from "../lib/token";
 import { Repository } from "../repository";
-import { AuthService, createAuthService } from "./authService";
-import { createRegisterService, RegisterService } from "./registerService";
-import { createServerInternalService, ServerInternalService } from "./serverInternalService";
+import { AuthService, createAuthService } from "./auth";
+import { createRegisterService, RegisterService } from "./register";
+import { createServerInternalService, ServerInternalService } from "./serverInternal";
 
 export interface Services {
   authService: AuthService;
