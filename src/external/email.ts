@@ -11,20 +11,32 @@ interface EmailExternalDeps {
 }
 
 export async function createEmailExternal({ config }: EmailExternalDeps): Promise<EmailExternal> {
-  const { host, port, secure, user, pass, senderAddress } = await config.get("EMAIL_CONFIG");
+  let transporter: nodemailer.Transporter;
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure,
-    auth: {
-      user,
-      pass,
-    },
+  const setTransporter = async () => {
+    const { host, port, secure, user, pass } = await config.get("EMAIL_CONFIG");
+
+    transporter = nodemailer.createTransport({
+      host,
+      port,
+      secure,
+      auth: {
+        user,
+        pass,
+      },
+    });
+  };
+
+  config.subscribe("EMAIL_CONFIG", async () => {
+    await setTransporter();
   });
+
+  await setTransporter();
 
   return {
     async sendEmail(to, subject, html) {
+      const { senderAddress } = await config.get("EMAIL_CONFIG");
+
       const res = await transporter.sendMail({
         sender: `<${senderAddress}>`,
         to: to,
