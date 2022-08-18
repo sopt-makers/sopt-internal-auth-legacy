@@ -19,14 +19,14 @@ export function createDBConfigStore<T extends StringKeyObject>(
 
       const rawData = await configRepository.getConfig(key as string);
       if (rawData === null) {
-        throw new ConfigStoreError(`Config for key '${key}' does not exists.`);
+        throw new ConfigStoreError(`Config key '${key}' does not exists.`);
       }
 
       const data = JSON.parse(rawData);
 
       const { success } = validator[key].safeParse(data);
       if (!success) {
-        throw new ConfigStoreError(`Config for key '${key}' is invalid.`);
+        throw new ConfigStoreError(`Config value for key '${key}' is invalid.`);
       }
 
       cache.set(key, data);
@@ -39,6 +39,13 @@ export function createDBConfigStore<T extends StringKeyObject>(
     },
     async flush() {
       cache.clear();
+    },
+    isKeyValid(key): key is keyof T {
+      return key in validator;
+    },
+    isValueValid<K extends keyof T>(key: K, value: unknown): value is T[K] {
+      const { success } = validator[key].safeParse(value);
+      return success;
     },
   };
 }

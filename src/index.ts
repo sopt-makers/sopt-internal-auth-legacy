@@ -3,7 +3,7 @@ import express from "express";
 import morgan from "morgan";
 
 import { configDef } from "./config";
-import { DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./const";
+import { ADMIN_ACCESS_TOKEN, DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./const";
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
@@ -61,7 +61,7 @@ import { createServices } from "./service";
     config,
   });
 
-  app.use("/api/v1", createRoutes({ services, tokenClient }));
+  app.use("/api/v1", createRoutes({ services, adminAccessToken: ADMIN_ACCESS_TOKEN }));
 
   app.listen(PORT, () => {
     console.log(`Server Started: (http://localhost:${PORT})`);

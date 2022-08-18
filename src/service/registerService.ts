@@ -63,6 +63,7 @@ export function createRegisterService({
       );
 
       if (err) {
+        console.log(err);
         return {
           status: "cannotSendEmail",
         };

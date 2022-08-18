@@ -4,10 +4,12 @@ import { TokenClient } from "../lib/token";
 import { Repository } from "../repository";
 import { AuthService, createAuthService } from "./authService";
 import { createRegisterService, RegisterService } from "./registerService";
+import { createServerInternalService, ServerInternalService } from "./serverInternalService";
 
 export interface Services {
   authService: AuthService;
   registerService: RegisterService;
+  serverInternalService: ServerInternalService;
 }
 
 interface CreateServicesDeps {
@@ -31,6 +33,9 @@ export function createServices({ repository, externals, tokenClient, config }: C
       emailExternal: externals.email,
       soptMemberRepository: repository.soptMember,
       tokenClient: tokenClient,
+      config,
+    }),
+    serverInternalService: createServerInternalService({
       config,
     }),
   };

@@ -23,9 +23,11 @@ export function createConfigRepository({ db }: ConfigRepositoryDeps): ConfigRepo
           key,
           value,
         })
-        .onDuplicateKeyUpdate({
-          value,
-        })
+        .onConflict((oc) =>
+          oc.column("key").doUpdateSet({
+            value,
+          }),
+        )
         .execute();
     },
   };

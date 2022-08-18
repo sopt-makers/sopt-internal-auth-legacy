@@ -13,3 +13,4 @@ export const PORT = process.env.PORT ?? 5000;
 export const DATABASE_URI = required("DATABASE_URI");
 export const ORIGIN = required("ORIGIN");
 export const JWT_SECRET = required("JWT_SECRET");
+export const ADMIN_ACCESS_TOKEN = required("ADMIN_ACCESS_TOKEN");
