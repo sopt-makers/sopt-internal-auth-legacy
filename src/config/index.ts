@@ -4,7 +4,7 @@ import { createDBConfigStore } from "../lib/configStore/dbConfigStore";
 import { ConfigRepository } from "../repository/config";
 
 export const configDef = {
-  REGISTER_EMAIL_TEMPLATE: z.string(),
+  REGISTER_PAGE_URL_TEMPLATE: z.string(),
   WEBHOOK_ON_REGISTER: z.array(z.string()),
   FACEBOOK_OAUTH: z.object({
     clientAppId: z.string(),
@@ -23,7 +23,10 @@ export const configDef = {
 };
 
 export function createServerConfig(configRepository: ConfigRepository) {
-  return createDBConfigStore({ configRepository }, configDef);
+  return createDBConfigStore(
+    { getConfig: configRepository.getConfig, setConfig: configRepository.setConfig },
+    configDef,
+  );
 }
 
 export type ServerConfig = ReturnType<typeof createServerConfig>;

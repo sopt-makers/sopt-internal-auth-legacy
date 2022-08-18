@@ -1,12 +1,12 @@
-import { ConfigRepository } from "../../repository/config";
 import { ChangeHandlerFunction, ConfigStore, StringKeyObject, Validator } from "./types";
 
-interface DBConfigStoreDeps {
-  configRepository: ConfigRepository;
+interface ConfigDBAccesser {
+  getConfig(key: string): Promise<string | null>;
+  setConfig(key: string, value: string): Promise<void>;
 }
 
 export function createDBConfigStore<T extends StringKeyObject>(
-  { configRepository }: DBConfigStoreDeps,
+  configDB: ConfigDBAccesser,
   validator: Validator<T>,
 ): ConfigStore<T> {
   const cache = new Map<keyof T, T[never]>();
@@ -29,7 +29,7 @@ export function createDBConfigStore<T extends StringKeyObject>(
         return cachedValue;
       }
 
-      const rawData = await configRepository.getConfig(key as string);
+      const rawData = await configDB.getConfig(key as string);
       if (rawData === null) {
         throw new ConfigStoreError(`Config key '${key}' does not exists.`);
       }
@@ -74,7 +74,7 @@ export function createDBConfigStore<T extends StringKeyObject>(
 
     async set(key, value) {
       cache.delete(key);
-      await configRepository.setConfig(key as string, JSON.stringify(value));
+      await configDB.setConfig(key as string, JSON.stringify(value));
       notifySubscribers(key);
     },
 

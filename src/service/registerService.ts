@@ -56,7 +56,7 @@ export function createRegisterService({
           "SOPT 회원 인증",
           createRegisterEmailHTML({
             name: soptMember.name ?? "이름 없음",
-            registerPageUriTemplate: await config.get("REGISTER_EMAIL_TEMPLATE"),
+            registerPageUriTemplate: await config.get("REGISTER_PAGE_URL_TEMPLATE"),
             token,
           }),
         ),

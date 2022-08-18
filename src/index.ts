@@ -2,13 +2,12 @@ import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 
-import { configDef } from "./config";
+import { createServerConfig } from "./config";
 import { ADMIN_ACCESS_TOKEN, DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./const";
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
 import { createWebHookExternal } from "./external/webHook";
-import { createDBConfigStore } from "./lib/configStore/dbConfigStore";
 import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
@@ -31,7 +30,7 @@ import { createServices } from "./service";
     db,
   });
 
-  const config = createDBConfigStore({ configRepository: repository.config }, configDef);
+  const config = createServerConfig(repository.config);
 
   const emailExternal = await createEmailExternal({
     config,
