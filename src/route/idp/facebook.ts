@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
 
-import { Services } from "../service";
-import { asyncRoute, validateInput } from "../util/route";
+import { Services } from "../../service";
+import { asyncRoute, validateInput } from "../../util/route";
 
 interface FacebookRouteDeps {
   services: Services;
@@ -44,12 +44,12 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
       const data = validateInput(
         req.body,
         z.object({
-          facebookAuthCode: z.string(),
+          code: z.string(),
           registerToken: z.string(),
         }),
       );
 
-      const ret = await services.authService.registerByFacebook(data.registerToken, data.facebookAuthCode);
+      const ret = await services.authService.registerByFacebook(data.registerToken, data.code);
 
       if (ret.success) {
         res.status(200).json({

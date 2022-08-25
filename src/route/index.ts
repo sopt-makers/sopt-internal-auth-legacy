@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 
 import { Services } from "../service";
 import { ZodValidationError } from "../util/route";
-import { createFacebookRoute } from "./facebook";
+import { createFacebookRoute } from "./idp/facebook";
 import { createRegisterRoute } from "./register";
 import { createServerInternalRoute } from "./serverInternal";
 interface CreateRoutesDeps {
