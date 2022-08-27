@@ -1,5 +1,6 @@
 import { ServerConfig } from "../config";
 import { Externals } from "../external";
+import { Notifier } from "../external/notifier";
 import { TokenClient } from "../lib/token";
 import { Repository } from "../repository";
 import { AuthService, createAuthService } from "./auth";
@@ -17,9 +18,10 @@ interface CreateServicesDeps {
   externals: Externals;
   tokenClient: TokenClient;
   config: ServerConfig;
+  notifier: Notifier;
 }
 
-export function createServices({ repository, externals, tokenClient, config }: CreateServicesDeps): Services {
+export function createServices({ repository, externals, tokenClient, config, notifier }: CreateServicesDeps): Services {
   return {
     authService: createAuthService({
       facebookAPIExternal: externals.facebookAPI,
@@ -34,6 +36,7 @@ export function createServices({ repository, externals, tokenClient, config }: C
       soptMemberRepository: repository.soptMember,
       tokenClient: tokenClient,
       config,
+      notifier,
     }),
     serverInternalService: createServerInternalService({
       config,

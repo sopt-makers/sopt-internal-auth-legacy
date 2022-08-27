@@ -29,7 +29,7 @@ export function createRoutes({ services, adminAccessToken, notifier }: CreateRou
     } else {
       res.status(500).json({ message: "Internal Server Error" });
       console.error("[Error]: Internal Server Error:", err.message);
-      notifier.notifyError(err);
+      notifier.notifyError("서버 500 에러", err);
     }
   });
 

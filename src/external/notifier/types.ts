@@ -1,4 +1,4 @@
 export interface Notifier {
-  notifyError(error: Error): void;
+  notifyError(type: string, error: Error, moreInfo?: unknown): void;
   notifyServerStart(): void;
 }

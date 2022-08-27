@@ -34,18 +34,6 @@ import { syncObject } from "./util/syncObject";
 
   const config = createServerConfig(repository.config);
 
-  const emailExternal = await createEmailExternal({
-    config,
-  });
-
-  const facebookAPIExternal = createFacebookAPIExternal({
-    config,
-  });
-
-  const webHookExternal = createWebHookExternal({
-    config,
-  });
-
   const notifier = await syncObject(
     (sync) => config.subscribe("SLACK_NOTIFY", sync),
     async () => {
@@ -56,6 +44,19 @@ import { syncObject } from "./util/syncObject";
       return new SlackNotifier(slackConfig.botToken, slackConfig.channels);
     },
   );
+
+  const emailExternal = await createEmailExternal({
+    config,
+  });
+
+  const facebookAPIExternal = createFacebookAPIExternal({
+    config,
+    notifier,
+  });
+
+  const webHookExternal = createWebHookExternal({
+    config,
+  });
 
   const tokenClient = createTokenClient({
     jwtSecret: JWT_SECRET,
@@ -71,6 +72,7 @@ import { syncObject } from "./util/syncObject";
     },
     tokenClient,
     config,
+    notifier,
   });
 
   app.use("/api/v1", createRoutes({ services, notifier, adminAccessToken: ADMIN_ACCESS_TOKEN }));

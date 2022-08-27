@@ -3,6 +3,7 @@ import to from "await-to-js";
 import { createRegisterEmailHTML } from "../assets/emailTemplate";
 import { ServerConfig } from "../config";
 import { EmailExternal } from "../external/email";
+import { Notifier } from "../external/notifier";
 import { TokenClient } from "../lib/token";
 import { SoptMemberRepsitory } from "../repository/soptMember";
 
@@ -25,6 +26,7 @@ interface RegisterServiceDeps {
   soptMemberRepository: SoptMemberRepsitory;
   tokenClient: TokenClient;
   config: ServerConfig;
+  notifier: Notifier;
 }
 
 export function createRegisterService({
@@ -32,6 +34,7 @@ export function createRegisterService({
   soptMemberRepository,
   tokenClient,
   config,
+  notifier,
 }: RegisterServiceDeps): RegisterService {
   return {
     async sendRegisterLinkByEmail(email) {
@@ -63,7 +66,8 @@ export function createRegisterService({
       );
 
       if (err) {
-        console.log(err);
+        console.error(err);
+        notifier.notifyError("이메일 전송 실패", err);
         return {
           status: "cannotSendEmail",
         };
