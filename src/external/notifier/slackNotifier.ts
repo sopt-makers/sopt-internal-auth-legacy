@@ -1,6 +1,6 @@
 import { WebClient } from "@slack/web-api";
 
-import { Notifier } from "./types";
+import { Notifier, UserInfo } from "./types";
 
 interface ChannelMap {
   error?: string;
@@ -24,7 +24,7 @@ export class SlackNotifier implements Notifier {
       ? [
           {
             title: "추가 정보",
-            value: JSON.stringify(moreInfo),
+            value: "```" + JSON.stringify(moreInfo, null, 2) + "```",
             short: false,
           },
         ]
@@ -32,9 +32,10 @@ export class SlackNotifier implements Notifier {
 
     await this.slack.chat.postMessage({
       channel: this.channel.error,
+      text: "인증 서버에서 처리되지 않은 오류가 발생했어요! :smiling_face_with_tear:",
       attachments: [
         {
-          mrkdwn_in: ["text"],
+          mrkdwn_in: ["text", "fields"],
           color: "#ff0000",
           pretext: "인증 서버에서 처리되지 않은 오류가 발생했어요! :smiling_face_with_tear:",
           fields: [
@@ -50,7 +51,7 @@ export class SlackNotifier implements Notifier {
             },
             {
               title: "스택 정보",
-              value: `${error.stack}`,
+              value: "```" + `${error.stack}` + "```",
               short: false,
             },
             ...moreInfoBlock,
@@ -69,6 +70,36 @@ export class SlackNotifier implements Notifier {
     await this.slack.chat.postMessage({
       channel: this.channel.info,
       text: "인증 서버가 시작되었어요! :rocket:",
+    });
+  }
+
+  async notifyUserRegistrer(userInfo: UserInfo) {
+    if (!this.channel.join) {
+      return;
+    }
+
+    await this.slack.chat.postMessage({
+      channel: this.channel.join,
+      attachments: [
+        {
+          mrkdwn_in: ["text", "fields"],
+          color: "#00ff00",
+          pretext: "새로운 유저가 가입했어요! :+1:",
+          fields: [
+            {
+              title: "이름",
+              value: userInfo.name,
+              short: true,
+            },
+            {
+              title: "기수",
+              value: `${userInfo.generation}`,
+              short: true,
+            },
+          ],
+          ts: `${Date.now()}`,
+        },
+      ],
     });
   }
 }

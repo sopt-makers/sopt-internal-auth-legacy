@@ -29,7 +29,8 @@ export function createServices({ repository, externals, tokenClient, config, not
       facebookAuthRepository: repository.facebookAuth,
       userRepository: repository.user,
       soptMemberRepository: repository.soptMember,
-      tokenClient: tokenClient,
+      tokenClient,
+      notifier,
     }),
     registerService: createRegisterService({
       emailExternal: externals.email,

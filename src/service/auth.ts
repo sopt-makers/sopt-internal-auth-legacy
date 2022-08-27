@@ -1,4 +1,5 @@
 import { FacebookAPIExternal } from "../external/facebookAPI";
+import { Notifier } from "../external/notifier";
 import { WebHookExternal } from "../external/webHook";
 import { TokenClient } from "../lib/token";
 import { FacebookAuthRepository } from "../repository/facebookAuth";
@@ -24,6 +25,7 @@ interface AuthServiceDeps {
   userRepository: UserRepository;
   soptMemberRepository: SoptMemberRepsitory;
   tokenClient: TokenClient;
+  notifier: Notifier;
 }
 
 export function createAuthService({
@@ -33,6 +35,7 @@ export function createAuthService({
   userRepository,
   soptMemberRepository,
   tokenClient,
+  notifier,
 }: AuthServiceDeps): AuthService {
   return {
     async authByFacebook(code) {
@@ -99,6 +102,11 @@ export function createAuthService({
       await webHookExternal.callOnRegister({
         userId: createdUser.userId,
         name: createdUser.name,
+        generation: createdUser.generation,
+      });
+
+      notifier.notifyUserRegistrer({
+        name: createdUser.name ?? "Unknown",
         generation: createdUser.generation,
       });
 

@@ -19,7 +19,7 @@ export function createRoutes({ services, adminAccessToken, notifier }: CreateRou
   router.use("/register", createRegisterRoute({ services }));
   router.use("/serverInternal", createServerInternalRoute({ services, adminAccessToken }));
 
-  router.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
+  router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     if (res.headersSent) {
       return next(err);
     }
@@ -29,7 +29,10 @@ export function createRoutes({ services, adminAccessToken, notifier }: CreateRou
     } else {
       res.status(500).json({ message: "Internal Server Error" });
       console.error("[Error]: Internal Server Error:", err.message);
-      notifier.notifyError("서버 500 에러", err);
+      notifier.notifyError("서버 500 에러", err, {
+        url: req.url,
+        method: req.method,
+      });
     }
   });
 
