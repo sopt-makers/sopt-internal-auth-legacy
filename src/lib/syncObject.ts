@@ -1,4 +1,4 @@
-export async function syncObject<T extends object>(
+export async function syncedObject<T extends object>(
   setup: (sync: () => void) => void,
   factory: () => Promise<T>,
 ): Promise<T> {

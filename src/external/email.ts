@@ -1,22 +1,30 @@
 import nodemailer from "nodemailer";
 
-import { ServerConfig } from "../config";
-
 export interface EmailExternal {
-  sendEmail(to: string, subject: string, html: string): Promise<{ accepted: unknown[] }>;
+  sendEmail(to: string, subject: string, html: string): Promise<SendEmailResult>;
 }
 
-interface EmailExternalDeps {
-  config: ServerConfig;
+interface SendEmailResult {
+  accepted: unknown[];
 }
 
-export async function createEmailExternal({ config }: EmailExternalDeps): Promise<EmailExternal> {
-  let transporter: nodemailer.Transporter;
+interface EmailConfig {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+  senderAddress: string;
+}
 
-  const setTransporter = async () => {
-    const { host, port, secure, user, pass } = await config.get("EMAIL_CONFIG");
+export class NodeMailerEmailExternal implements EmailExternal {
+  private transporter: nodemailer.Transporter;
+  private senderAddress: string;
 
-    transporter = nodemailer.createTransport({
+  constructor(emailConfig: EmailConfig) {
+    const { host, port, secure, user, pass, senderAddress } = emailConfig;
+
+    this.transporter = nodemailer.createTransport({
       host,
       port,
       secure,
@@ -25,25 +33,17 @@ export async function createEmailExternal({ config }: EmailExternalDeps): Promis
         pass,
       },
     });
-  };
 
-  config.subscribe("EMAIL_CONFIG", async () => {
-    await setTransporter();
-  });
+    this.senderAddress = senderAddress;
+  }
 
-  await setTransporter();
-
-  return {
-    async sendEmail(to, subject, html) {
-      const { senderAddress } = await config.get("EMAIL_CONFIG");
-
-      const res = await transporter.sendMail({
-        sender: `<${senderAddress}>`,
-        to: to,
-        subject,
-        html,
-      });
-      return res;
-    },
-  };
+  async sendEmail(to: string, subject: string, html: string): Promise<SendEmailResult> {
+    const res = await this.transporter.sendMail({
+      sender: `<${this.senderAddress}>`,
+      to: to,
+      subject,
+      html,
+    });
+    return res;
+  }
 }
