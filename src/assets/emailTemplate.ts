@@ -16,7 +16,7 @@ export function createRegisterEmailHTML(data: { name: string; token: string; reg
   const registerPageUri = encodeURI(data.registerPageUriTemplate.replace("{{token}}", data.token));
 
   return `
-        <div style="text-align:center;font-weight:400;">
+        <div style="text-align:center;font-weight:400;color:black;">
             <br><br><br>
             <h1 style="font-size: 32px;">SOPT 회원인증 완료</h1>
             <p style="font-size: 16px;">SOPT 회원인증을 위한 메일입니다.<br>아래의 버튼을 눌러 회원가입 절차를 계속 진행해주세요.</p>
