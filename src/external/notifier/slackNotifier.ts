@@ -37,7 +37,6 @@ export class SlackNotifier implements Notifier {
         {
           mrkdwn_in: ["text", "fields"],
           color: "#ff0000",
-          pretext: "인증 서버에서 처리되지 않은 오류가 발생했어요! :smiling_face_with_tear:",
           fields: [
             {
               title: "종류",
