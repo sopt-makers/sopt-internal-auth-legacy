@@ -45,20 +45,20 @@ export function createRegisterService({
         };
       }
 
-      if (soptMember.userId !== null) {
+      if (soptMember.some((item) => item.joined)) {
         return {
           status: "alreadyTaken",
         };
       }
 
-      const token = await tokenClient.createRegisterToken(soptMember.id);
+      const token = await tokenClient.createRegisterToken(email);
 
       const [err] = await to(
         emailExternal.sendEmail(
           email,
           "SOPT 회원 인증",
           createRegisterEmailHTML({
-            name: soptMember.name ?? "이름 없음",
+            name: soptMember[0].name ?? "이름 없음",
             registerPageUriTemplate: await config.get("REGISTER_PAGE_URL_TEMPLATE"),
             token,
           }),
@@ -83,15 +83,15 @@ export function createRegisterService({
         return { success: false };
       }
 
-      const member = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
-      if (!member) {
+      const member = await soptMemberRepository.findByEmail(registerTokenInfo.registerEmail);
+      if (member.length === 0) {
         return { success: false };
       }
 
       return {
         success: true,
-        name: member.name ?? "",
-        generation: member.generation,
+        name: member[0].name ?? "",
+        generation: member[0].generation,
       };
     },
   };

@@ -77,24 +77,26 @@ export function createAuthService({
 
       const fbUserInfo = await facebookAPIExternal.getAccessTokenInfo(fbAccessToken);
 
-      const soptMemberInfo = await soptMemberRepository.findById(registerTokenInfo.soptMemberId);
-      if (soptMemberInfo === null) {
-        throw new Error(`Member id ${registerTokenInfo.soptMemberId} not found.`);
+      const soptMemberInfos = await soptMemberRepository.findByEmail(registerTokenInfo.registerEmail);
+      if (soptMemberInfos.length === 0) {
+        throw new Error(`Member email ${registerTokenInfo.registerEmail} not found.`);
       }
 
-      if (soptMemberInfo.userId !== null) {
+      if (soptMemberInfos.some((item) => item.joined)) {
         return {
           success: false,
           status: "alreadyTaken",
         };
       }
 
+      const soptMemberInfo = soptMemberInfos[0];
+
       const createdUser = await userRepository.createUser({
         name: soptMemberInfo.name ?? "알 수 없음",
         generation: soptMemberInfo.generation,
       });
 
-      await soptMemberRepository.setUserId(registerTokenInfo.soptMemberId, createdUser.userId);
+      await soptMemberRepository.setMemberJoined(registerTokenInfo.registerEmail);
       await facebookAuthRepository.create({ authId: fbUserInfo.userId, userId: createdUser.userId });
 
       const accessToken = await tokenClient.createAuthToken({ userId: createdUser.userId });

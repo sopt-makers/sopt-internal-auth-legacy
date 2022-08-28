@@ -12,13 +12,13 @@ interface ConfigRepositoryDeps {
 export function createConfigRepository({ db }: ConfigRepositoryDeps): ConfigRepository {
   return {
     async getConfig(key) {
-      const ret = await db.selectFrom("auth_server_config").where("key", "=", key).selectAll().executeTakeFirst();
+      const ret = await db.selectFrom("AUTH_server_config").where("key", "=", key).selectAll().executeTakeFirst();
 
       return ret?.value ?? null;
     },
     async setConfig(key, value) {
       await db
-        .insertInto("auth_server_config")
+        .insertInto("AUTH_server_config")
         .values({
           key,
           value,

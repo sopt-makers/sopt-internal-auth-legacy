@@ -20,7 +20,7 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
   return {
     async findByUserId(userId) {
       const ret = await db
-        .selectFrom("users_facebook_auth")
+        .selectFrom("AUTH_idp_facebook")
         .select(["facebook_auth_id", "user_id"])
         .where("user_id", "=", userId)
         .executeTakeFirst();
@@ -36,7 +36,7 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
     },
     async findByAuthId(authId) {
       const ret = await db
-        .selectFrom("users_facebook_auth")
+        .selectFrom("AUTH_idp_facebook")
         .select(["facebook_auth_id", "user_id"])
         .where("facebook_auth_id", "=", authId)
         .executeTakeFirst();
@@ -52,7 +52,7 @@ export function createFacebookAuthRepository({ db }: FacebookAuthRepositoryDeps)
     },
     async create({ authId, userId }) {
       await db
-        .insertInto("users_facebook_auth")
+        .insertInto("AUTH_idp_facebook")
         .values({
           facebook_auth_id: authId,
           user_id: userId,
