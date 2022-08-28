@@ -20,6 +20,17 @@ export const configDef = {
     port: z.number(),
     secure: z.boolean(),
   }),
+  SLACK_NOTIFY: z.union([
+    z.null(),
+    z.object({
+      botToken: z.string(),
+      channels: z.object({
+        error: z.string().optional(),
+        info: z.string().optional(),
+        join: z.string().optional(),
+      }),
+    }),
+  ]),
 };
 
 export function createServerConfig(configRepository: ConfigRepository) {

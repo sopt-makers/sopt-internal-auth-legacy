@@ -7,11 +7,13 @@ import { ADMIN_ACCESS_TOKEN, DATABASE_URI, JWT_SECRET, ORIGIN, PORT } from "./co
 import { createDatabase } from "./database";
 import { createEmailExternal } from "./external/email";
 import { createFacebookAPIExternal } from "./external/facebookAPI";
+import { noopNotifier, SlackNotifier } from "./external/notifier";
 import { createWebHookExternal } from "./external/webHook";
 import { createTokenClient } from "./lib/token";
 import { createRepository } from "./repository";
 import { createRoutes } from "./route";
 import { createServices } from "./service";
+import { syncObject } from "./util/syncObject";
 
 (async function () {
   const app = express();
@@ -31,6 +33,17 @@ import { createServices } from "./service";
   });
 
   const config = createServerConfig(repository.config);
+
+  const notifier = await syncObject(
+    (sync) => config.subscribe("SLACK_NOTIFY", sync),
+    async () => {
+      const slackConfig = await config.get("SLACK_NOTIFY");
+      if (!slackConfig) {
+        return noopNotifier;
+      }
+      return new SlackNotifier(slackConfig.botToken, slackConfig.channels);
+    },
+  );
 
   const emailExternal = await createEmailExternal({
     config,
@@ -58,11 +71,13 @@ import { createServices } from "./service";
     },
     tokenClient,
     config,
+    notifier,
   });
 
-  app.use("/api/v1", createRoutes({ services, adminAccessToken: ADMIN_ACCESS_TOKEN }));
+  app.use("/api/v1", createRoutes({ services, notifier, adminAccessToken: ADMIN_ACCESS_TOKEN }));
 
   app.listen(PORT, () => {
-    console.log(`Server Started: (http://localhost:${PORT})`);
+    console.log(`Server Started: (${ORIGIN})`);
+    notifier.notifyServerStart();
   });
 })();

@@ -35,7 +35,7 @@ export function createFacebookAPIExternal({ config }: FacebokAPIExternalDeps): F
 
       if (err) {
         if (axios.isAxiosError(err)) {
-          console.log("Error occured in getAccessTokenByCode: ", err.response?.data);
+          console.error("Error occured in getAccessTokenByCode: ", err.response?.data);
         }
         return null;
       }
