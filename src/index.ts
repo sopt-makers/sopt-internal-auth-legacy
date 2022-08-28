@@ -51,7 +51,6 @@ import { syncObject } from "./util/syncObject";
 
   const facebookAPIExternal = createFacebookAPIExternal({
     config,
-    notifier,
   });
 
   const webHookExternal = createWebHookExternal({

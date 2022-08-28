@@ -2,7 +2,6 @@ import to from "await-to-js";
 import axios from "axios";
 
 import { ServerConfig } from "../config";
-import { Notifier } from "./notifier";
 
 export interface FacebookAPIExternal {
   getAccessTokenByCode(code: string, redirectType: "auth" | "register"): Promise<string | null>;
@@ -14,10 +13,9 @@ export interface FacebookAPIExternal {
 
 interface FacebokAPIExternalDeps {
   config: ServerConfig;
-  notifier: Notifier;
 }
 
-export function createFacebookAPIExternal({ config, notifier }: FacebokAPIExternalDeps): FacebookAPIExternal {
+export function createFacebookAPIExternal({ config }: FacebokAPIExternalDeps): FacebookAPIExternal {
   return {
     async getAccessTokenByCode(code, redirectType) {
       const { redirectUriAuth, redirectUriRegister, clientAppId, clientSecret } = await config.get("FACEBOOK_OAUTH");
@@ -38,7 +36,6 @@ export function createFacebookAPIExternal({ config, notifier }: FacebokAPIExtern
       if (err) {
         if (axios.isAxiosError(err)) {
           console.error("Error occured in getAccessTokenByCode: ", err.response?.data);
-          notifier.notifyError("페이스북 API 실패", err, err.response?.data);
         }
         return null;
       }
