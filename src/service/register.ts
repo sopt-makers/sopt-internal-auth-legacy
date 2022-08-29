@@ -39,7 +39,7 @@ export function createRegisterService({
   return {
     async sendRegisterLinkByEmail(email) {
       const soptMember = await soptMemberRepository.findByEmail(email);
-      if (!soptMember) {
+      if (soptMember.length === 0) {
         return {
           status: "invalidEmail",
         };
