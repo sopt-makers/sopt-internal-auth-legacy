@@ -1,9 +1,9 @@
 import { Database } from "../database";
 
 export interface SoptMemberRepsitory {
-  findByEmail(email: string): Promise<SoptMember | null>;
+  findByEmail(email: string): Promise<SoptMember[]>;
   findById(id: number): Promise<SoptMember | null>;
-  setUserId(memberId: number, userId: number): Promise<void>;
+  setMemberJoined(memberEmail: string, joined?: boolean): Promise<void>;
 }
 
 interface SoptMember {
@@ -11,7 +11,7 @@ interface SoptMember {
   name: string | null;
   email: string;
   generation: number;
-  userId: number | null;
+  joined: boolean;
 }
 
 interface SoptMemberRepositoryDeps {
@@ -22,26 +22,24 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
   return {
     async findByEmail(email) {
       const ret = await db
-        .selectFrom("sopt_member")
-        .select(["name", "email", "user_id", "id", "generation"])
+        .selectFrom("AUTH_sopt_member")
+        .select(["name", "email", "id", "generation", "joined"])
         .where("email", "=", email)
-        .executeTakeFirst();
+        .orderBy("generation", "asc")
+        .execute();
 
-      if (!ret) {
-        return null;
-      }
-      return {
-        id: ret.id ?? -1,
-        name: ret.name ?? null,
-        generation: ret.generation,
-        email: ret.email,
-        userId: ret.user_id ?? null,
-      };
+      return ret.map((item) => ({
+        id: item.id ?? -1,
+        name: item.name ?? null,
+        generation: item.generation,
+        email: item.email,
+        joined: item.joined ?? false,
+      }));
     },
     async findById(id) {
       const ret = await db
-        .selectFrom("sopt_member")
-        .select(["name", "email", "user_id", "generation", "id"])
+        .selectFrom("AUTH_sopt_member")
+        .select(["name", "email", "joined", "generation", "id"])
         .where("id", "=", id)
         .executeTakeFirst();
 
@@ -54,15 +52,15 @@ export function createSoptMemberRepsitory({ db }: SoptMemberRepositoryDeps): Sop
         name: ret.name ?? null,
         generation: ret.generation,
         email: ret.email,
-        userId: ret.user_id ?? null,
+        joined: ret.joined ?? false,
       };
     },
-    async setUserId(memberId, userId) {
+    async setMemberJoined(memberEmail, joined = true) {
       await db
-        .updateTable("sopt_member")
-        .where("id", "=", memberId)
+        .updateTable("AUTH_sopt_member")
+        .where("email", "=", memberEmail)
         .set({
-          user_id: userId,
+          joined,
         })
         .executeTakeFirstOrThrow();
     },

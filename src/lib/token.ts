@@ -4,8 +4,8 @@ import { z } from "zod";
 export interface TokenClient {
   createAuthToken(data: { userId: number }): Promise<string>;
   verifyAuthToken(accessToken: string): Promise<{ userId: number }>;
-  createRegisterToken(soptMemberId: number): Promise<string>;
-  verifyRegisterToken(token: string): Promise<{ soptMemberId: number } | null>;
+  createRegisterToken(email: string): Promise<string>;
+  verifyRegisterToken(token: string): Promise<{ registerEmail: string } | null>;
 }
 
 interface TokenClientDeps {
@@ -49,8 +49,8 @@ export function createTokenClient({ jwtSecret, origin }: TokenClientDeps): Token
         userId,
       };
     },
-    async createRegisterToken(soptMemberId) {
-      const token = sign({ register: soptMemberId }, jwtSecret, { algorithm: "HS256", expiresIn: "6h" });
+    async createRegisterToken(email) {
+      const token = sign({ register: email }, jwtSecret, { algorithm: "HS256", expiresIn: "6h" });
       return token;
     },
     async verifyRegisterToken(token) {
@@ -60,17 +60,17 @@ export function createTokenClient({ jwtSecret, origin }: TokenClientDeps): Token
       }
 
       const validator = z.object({
-        register: z.number(),
+        register: z.string(),
       });
 
       const tokenInfo = validator.safeParse(extracted);
       if (!tokenInfo.success) {
         return null;
       }
-      const soptMemberId = tokenInfo.data.register;
+      const registerEmail = tokenInfo.data.register;
 
       return {
-        soptMemberId,
+        registerEmail,
       };
     },
   };
