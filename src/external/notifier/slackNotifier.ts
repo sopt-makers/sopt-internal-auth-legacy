@@ -79,11 +79,11 @@ export class SlackNotifier implements Notifier {
 
     await this.slack.chat.postMessage({
       channel: this.channel.join,
+      text: "새로운 유저가 가입했어요! :+1:",
       attachments: [
         {
           mrkdwn_in: ["text", "fields"],
           color: "#00ff00",
-          pretext: "새로운 유저가 가입했어요! :+1:",
           fields: [
             {
               title: "이름",
