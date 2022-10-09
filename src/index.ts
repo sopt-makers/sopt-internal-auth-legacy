@@ -55,6 +55,8 @@ import { syncObject } from "./util/syncObject";
 
   const webHookExternal = createWebHookExternal({
     config,
+    notifier,
+    WEBHOOK_ACCESS_TOKEN: ADMIN_ACCESS_TOKEN,
   });
 
   const tokenClient = createTokenClient({
