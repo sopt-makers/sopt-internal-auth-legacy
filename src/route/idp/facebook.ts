@@ -57,17 +57,17 @@ export function createFacebookRoute({ services }: FacebookRouteDeps) {
         });
       } else if (ret.status === "alreadyTaken") {
         res.status(403).json({
-          status: "alreadyTaken",
+          code: "alreadyTaken",
           message: "이미 가입된 사용자입니다.",
         });
       } else if (ret.status === "idpFailed") {
         res.status(403).json({
-          status: "idpFailed",
+          code: "idpFailed",
           message: "facebook 인증에 실패했습니다.",
         });
       } else if (ret.status === "tokenInvalid") {
         res.status(400).json({
-          status: "tokenInvalid",
+          code: "invalidToken",
           message: "가입 토큰이 유효하지 않습니다.",
         });
       }

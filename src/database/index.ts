@@ -10,7 +10,6 @@ export interface DatabaseSchema {
 }
 
 export type Database = Kysely<DatabaseSchema>;
-
 interface CreateDatabaseDeps {
   DATABASE_URI: string;
 }
