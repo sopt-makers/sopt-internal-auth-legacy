@@ -10,7 +10,7 @@ CREATE TABLE "AUTH_idp_facebook" (
 	facebook_auth_id text NOT NULL,
   user_id INT NOT NULL,
 
-  FOREIGN KEY (user_id) REFERENCES AUTH_user(id)
+  FOREIGN KEY (user_id) REFERENCES "AUTH_user"(id)
 );
 
 CREATE TABLE "AUTH_sopt_member" (
